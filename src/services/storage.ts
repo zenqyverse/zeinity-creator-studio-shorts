@@ -100,7 +100,7 @@ async function syncToSupabaseAsync(contents: ContentItem[]): Promise<void> {
         updated_at: new Date().toISOString()
       });
 
-      // 2. Upsert script
+      // 2. Upsert script (termasuk riwayat revisi snapshots)
       await client.from('scripts').upsert({
         content_id: item.id,
         stage_hook: item.script.stageHook,
@@ -110,6 +110,7 @@ async function syncToSupabaseAsync(contents: ContentItem[]): Promise<void> {
         full_script: item.script.fullScript,
         version: item.script.version,
         wpm_pace: item.script.wpmPace,
+        history: item.script.history || [],
         updated_at: new Date().toISOString()
       });
 

@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS scripts (
     full_script TEXT DEFAULT '',
     version INT DEFAULT 1,
     wpm_pace INT DEFAULT 145,
+    history JSONB DEFAULT '[]'::jsonb,
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 

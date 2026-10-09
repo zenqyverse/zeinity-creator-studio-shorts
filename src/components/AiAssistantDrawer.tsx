@@ -32,6 +32,8 @@ interface AiAssistantDrawerProps {
   settings: AppSettings;
   onOpenSettings: () => void;
   onCreateShortFromIdea?: (item: ContentItem) => void;
+  activeContent?: ContentItem | null;
+  onApplyHookOrLoop?: (type: 'hook' | 'loop', text: string) => void;
 }
 
 export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
@@ -39,7 +41,9 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
   onClose,
   settings,
   onOpenSettings,
-  onCreateShortFromIdea
+  onCreateShortFromIdea,
+  activeContent,
+  onApplyHookOrLoop
 }) => {
   const [activeTab, setActiveTab] = useState<'topics' | 'titles' | 'hook_loop' | 'script' | 'factcheck'>('topics');
   
@@ -58,6 +62,7 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
   const [hookTopic, setHookTopic] = useState('');
   const [hookRefText, setHookRefText] = useState('');
   const [generatedHookLoops, setGeneratedHookLoops] = useState<string[]>([]);
+  const [appliedIndex, setAppliedIndex] = useState<number | null>(null);
 
   // Fact check state
   const [claimToVerify, setClaimToVerify] = useState('');
@@ -69,6 +74,18 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
   const [generatedScript, setGeneratedScript] = useState<any>(null);
 
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  // Pre-populate input states from active content when opened
+  React.useEffect(() => {
+    if (activeContent) {
+      if (!hookTopic) setHookTopic(activeContent.title);
+      if (!hookRefText && activeContent.script?.stageHook) setHookRefText(activeContent.script.stageHook);
+      if (!inputTopicForTitles) setInputTopicForTitles(activeContent.title);
+      if (!scriptTopic) setScriptTopic(activeContent.title);
+      setSelectedPillar(activeContent.pillar);
+      setSelectedFormat(activeContent.format);
+    }
+  }, [activeContent]);
 
   if (!isOpen) return null;
 
@@ -507,17 +524,45 @@ Tolong berikan:
                         <span className="text-purple-400 font-bold mr-1.5">#{idx + 1}</span>
                         {text}
                       </span>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(text);
-                          setCopiedIndex(idx);
-                          setTimeout(() => setCopiedIndex(null), 1500);
-                        }}
-                        className="p-1 text-slate-400 hover:text-white shrink-0"
-                        title="Salin teks"
-                      >
-                        {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(text);
+                            setCopiedIndex(idx);
+                            setTimeout(() => setCopiedIndex(null), 1500);
+                          }}
+                          className="p-1 text-slate-400 hover:text-white"
+                          title="Salin teks"
+                        >
+                          {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                        {onApplyHookOrLoop && activeContent && (
+                          <button
+                            onClick={() => {
+                              onApplyHookOrLoop(hookLoopType, text);
+                              setAppliedIndex(idx);
+                              setTimeout(() => setAppliedIndex(null), 1500);
+                            }}
+                            className="px-2.5 py-1 rounded bg-purple-600/25 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 text-[11px] font-semibold transition-all"
+                            title="Terapkan ke naskah short yang sedang dibuka di workspace"
+                          >
+                            {appliedIndex === idx ? '✓ Diterapkan' : 'Terapkan'}
+                          </button>
+                        )}
+                        {!activeContent && onCreateShortFromIdea && hookLoopType === 'hook' && (
+                          <button
+                            onClick={() => {
+                              const item = createNewShort(hookTopic || 'Short Baru', selectedPillar, selectedFormat);
+                              item.hookText = text;
+                              item.script.stageHook = text;
+                              onCreateShortFromIdea(item);
+                            }}
+                            className="px-2 py-1 rounded bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-[10px] font-semibold transition-all"
+                          >
+                            + Buat Short
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
                       <span>{words} kata</span>

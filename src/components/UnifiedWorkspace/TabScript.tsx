@@ -70,6 +70,7 @@ export const TabScript: React.FC<TabScriptProps> = ({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [snapshotNote, setSnapshotNote] = useState('');
   const [showSnapshotInput, setShowSnapshotInput] = useState(false);
+  const [expandedSnapId, setExpandedSnapId] = useState<string | null>(null);
 
   // Teleprompter Modal state
   const [isTeleprompterOpen, setIsTeleprompterOpen] = useState(false);
@@ -95,12 +96,13 @@ export const TabScript: React.FC<TabScriptProps> = ({
   const isWordsTooShort = totalWords > 0 && totalWords < ZEINITY_STANDARDS.scriptWords.min;
   const isWordsTooLong = totalWords > ZEINITY_STANDARDS.scriptWords.max;
 
-  // Sync stage edits into fullScript
+  // Sync stage edits into fullScript and keep hookText synchronized
   const updateScriptStages = (newStages: Partial<typeof content.script>) => {
     const nextScript = { ...content.script, ...newStages };
     const merged = `${nextScript.stageHook} ${nextScript.stageContext} ${nextScript.stagePayoff} ${nextScript.stageEnding}`.trim();
     onChange({
       ...content,
+      hookText: newStages.stageHook !== undefined ? newStages.stageHook : content.hookText,
       script: {
         ...nextScript,
         fullScript: merged
@@ -118,6 +120,42 @@ export const TabScript: React.FC<TabScriptProps> = ({
         fullScript: text
       },
       updatedAt: new Date().toISOString()
+    });
+  };
+
+  // Helper membagi naskah utuh ke 4 stage secara proporsional
+  const handleSyncFreeformToStages = () => {
+    const text = content.script.fullScript.trim();
+    if (!text) return;
+    
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map(s => s.trim()).filter(Boolean) || [text];
+    
+    let hook = '';
+    let context = '';
+    let payoff = '';
+    let ending = '';
+    
+    if (sentences.length === 1) {
+      hook = sentences[0];
+    } else if (sentences.length === 2) {
+      hook = sentences[0];
+      payoff = sentences[1];
+    } else if (sentences.length === 3) {
+      hook = sentences[0];
+      context = sentences[1];
+      ending = sentences[2];
+    } else {
+      hook = sentences[0];
+      context = sentences[1];
+      ending = sentences[sentences.length - 1];
+      payoff = sentences.slice(2, sentences.length - 1).join(' ');
+    }
+    
+    updateScriptStages({
+      stageHook: hook,
+      stageContext: context,
+      stagePayoff: payoff,
+      stageEnding: ending
     });
   };
 
@@ -243,6 +281,7 @@ export const TabScript: React.FC<TabScriptProps> = ({
     const existingHistory = content.script.history || [];
     onChange({
       ...content,
+      hookText: snap.stageHook || content.hookText,
       script: {
         ...content.script,
         stageHook: snap.stageHook,
@@ -662,51 +701,83 @@ export const TabScript: React.FC<TabScriptProps> = ({
               Belum ada snapshot naskah yang disimpan. Klik "Simpan Snapshot" untuk mencatat versi naskah saat ini.
             </div>
           ) : (
-            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-              {(content.script.history || []).map((snap, idx) => (
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+              {(content.script.history || []).map((snap) => (
                 <div
                   key={snap.id}
-                  className="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
+                  className="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 transition-colors space-y-2"
                 >
-                  <div className="space-y-1 overflow-hidden">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">
-                        v{snap.version}
-                      </span>
-                      <strong className="text-xs text-white">{snap.note || 'Snapshot'}</strong>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        {new Date(snap.timestamp).toLocaleString('id-ID')}
-                      </span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="space-y-1 overflow-hidden flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">
+                          v{snap.version}
+                        </span>
+                        <strong className="text-xs text-white">{snap.note || 'Snapshot'}</strong>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {new Date(snap.timestamp).toLocaleString('id-ID')}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-slate-400 line-clamp-1 font-mono">
+                        {snap.fullScript ? `"${snap.fullScript.slice(0, 90)}..."` : '(Teks kosong)'}
+                      </p>
+
+                      <div className="flex items-center gap-3 text-[10px] text-slate-500 font-mono">
+                        <span>{snap.wordCount} kata</span>
+                        <span>~{Math.round((snap.wordCount / (snap.wpmPace || 145)) * 60)}s</span>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedSnapId(expandedSnapId === snap.id ? null : snap.id)}
+                          className="text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 underline font-sans"
+                        >
+                          <Eye className="w-3 h-3" />
+                          {expandedSnapId === snap.id ? 'Sembunyikan' : 'Lihat Detail'}
+                        </button>
+                      </div>
                     </div>
 
-                    <p className="text-[11px] text-slate-400 line-clamp-1 font-mono">
-                      {snap.fullScript ? `"${snap.fullScript.slice(0, 90)}..."` : '(Teks kosong)'}
-                    </p>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleRestoreSnapshot(snap)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-all"
+                        title="Kembalikan naskah saat ini ke versi ini"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Restore
+                      </button>
 
-                    <div className="flex items-center gap-3 text-[10px] text-slate-500 font-mono">
-                      <span>{snap.wordCount} kata</span>
-                      <span>~{Math.round((snap.wordCount / (snap.wpmPace || 145)) * 60)}s</span>
+                      <button
+                        onClick={() => handleDeleteSnapshot(snap.id)}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        title="Hapus snapshot ini"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => handleRestoreSnapshot(snap)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-all"
-                      title="Kembalikan naskah saat ini ke versi ini"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      Restore
-                    </button>
-
-                    <button
-                      onClick={() => handleDeleteSnapshot(snap.id)}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                      title="Hapus snapshot ini"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  {/* EXPANDABLE 4-STAGE PREVIEW */}
+                  {expandedSnapId === snap.id && (
+                    <div className="pt-2.5 mt-2 border-t border-slate-800/80 space-y-2 text-[11px] font-sans animate-fadeIn">
+                      <div className="p-2 rounded-lg bg-slate-950/70 border border-cyan-500/20">
+                        <span className="font-bold text-cyan-400">Stage 1 Hook (0–3s): </span>
+                        <span className="text-slate-300">{snap.stageHook || '(kosong)'}</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-slate-950/70 border border-indigo-500/20">
+                        <span className="font-bold text-indigo-400">Stage 2 Context (4–10s): </span>
+                        <span className="text-slate-300">{snap.stageContext || '(kosong)'}</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-slate-950/70 border border-amber-500/20">
+                        <span className="font-bold text-amber-400">Stage 3 Payoff (11–45s): </span>
+                        <span className="text-slate-300">{snap.stagePayoff || '(kosong)'}</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-slate-950/70 border border-pink-500/20">
+                        <span className="font-bold text-pink-400">Stage 4 Loop (46–60s): </span>
+                        <span className="text-slate-300">{snap.stageEnding || '(kosong)'}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -950,9 +1021,20 @@ export const TabScript: React.FC<TabScriptProps> = ({
       ) : (
         /* FREEFORM / CONTINUOUS EDITOR */
         <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Editor Teks Bebas (Sinkronisasi Otomatis)</span>
-            <span className="font-mono">{totalWords} kata</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+            <div className="flex items-center gap-2">
+              <span>Editor Teks Bebas</span>
+              <span className="font-mono bg-slate-800 px-2 py-0.5 rounded text-slate-300">{totalWords} kata</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSyncFreeformToStages}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-all"
+              title="Bagi naskah bebas ini ke 4 stage secara proporsional"
+            >
+              <SplitSquareVertical className="w-3.5 h-3.5" />
+              Sinkronkan ke 4 Stage Guided
+            </button>
           </div>
           <textarea
             rows={12}

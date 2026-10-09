@@ -276,6 +276,34 @@ export function App() {
           handleSaveContent(item);
           setActiveShort(item);
         }}
+        activeContent={activeShort}
+        onApplyHookOrLoop={(type, text) => {
+          if (!activeShort) return;
+          if (type === 'hook') {
+            const updated: ContentItem = {
+              ...activeShort,
+              hookText: text,
+              script: {
+                ...activeShort.script,
+                stageHook: text,
+                fullScript: `${text} ${activeShort.script.stageContext} ${activeShort.script.stagePayoff} ${activeShort.script.stageEnding}`.trim()
+              },
+              updatedAt: new Date().toISOString()
+            };
+            handleSaveContent(updated);
+          } else {
+            const updated: ContentItem = {
+              ...activeShort,
+              script: {
+                ...activeShort.script,
+                stageEnding: text,
+                fullScript: `${activeShort.script.stageHook} ${activeShort.script.stageContext} ${activeShort.script.stagePayoff} ${text}`.trim()
+              },
+              updatedAt: new Date().toISOString()
+            };
+            handleSaveContent(updated);
+          }
+        }}
       />
     </div>
   );

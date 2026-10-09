@@ -79,14 +79,25 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
     }
   }, [isOpen]);
 
-  // Countdown before playing
+  // Countdown and play/pause toggling
   const handleTogglePlay = () => {
+    if (countdown !== null) {
+      // Langsung lewati hitungan mundur jika ditekan lagi
+      setCountdown(null);
+      setIsPlaying(true);
+      return;
+    }
     if (isPlaying) {
       setIsPlaying(false);
     } else {
-      if (countdown !== null) return;
-      // 3-second countdown
-      setCountdown(3);
+      // Jika baru dari awal (posisi scroll atas dan belum berjalan), jalankan 3-2-1
+      const isAtStart = (scrollContainerRef.current?.scrollTop || 0) <= 20 && elapsedSec === 0;
+      if (isAtStart) {
+        setCountdown(3);
+      } else {
+        // Melanjutkan pembacaan secara instan tanpa delay
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -104,7 +115,7 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
     }
   }, [countdown]);
 
-  // Auto-scroll loop
+  // Auto-scroll loop dengan kalkulasi kecepatan adaptif real-time
   useEffect(() => {
     if (!isPlaying) {
       lastTimeRef.current = null;
@@ -117,23 +128,22 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Hitung kecepatan scroll (pixel per detik)
-    // Tinggi konten dibagi total durasi naskah (detik)
-    const scrollHeight = container.scrollHeight - container.clientHeight;
-    const pixelsPerSecond = scrollHeight > 0 && targetDurationSec > 0
-      ? scrollHeight / targetDurationSec
-      : 35; // Fallback kecepatan scroll
-
     const step = (timestamp: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = timestamp;
       const deltaTime = (timestamp - lastTimeRef.current) / 1000;
       lastTimeRef.current = timestamp;
 
       if (container) {
+        const scrollHeight = container.scrollHeight - container.clientHeight;
+        const currentTargetSec = Math.round((totalWords / wpm) * 60);
+        const pixelsPerSecond = scrollHeight > 0 && currentTargetSec > 0
+          ? scrollHeight / currentTargetSec
+          : 35;
+
         const nextScroll = container.scrollTop + pixelsPerSecond * deltaTime;
         container.scrollTop = nextScroll;
 
-        // Cek jika sudah mencapai dasar
+        // Cek jika sudah mencapai batas bawah
         if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
           setIsPlaying(false);
           return;
@@ -150,7 +160,7 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, targetDurationSec]);
+  }, [isPlaying, wpm, totalWords, fontSize, viewMode]);
 
   // Elapsed timer when playing
   useEffect(() => {
@@ -163,7 +173,7 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
     return () => clearInterval(timer);
   }, [isPlaying]);
 
-  // Keyboard navigation shortcuts
+  // Keyboard navigation shortcuts (Spasi, R, Esc, ArrowUp, ArrowDown)
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -172,6 +182,12 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
         handleTogglePlay();
       } else if (e.key === 'r' || e.key === 'R') {
         handleReset();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setWpm(prev => Math.min(160, prev + 2));
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setWpm(prev => Math.max(130, prev - 2));
       } else if (e.key === 'Escape') {
         onClose();
       }
@@ -180,11 +196,23 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isPlaying, countdown]);
 
-  // Audio recording handlers
+  // Audio recording handlers dengan multi-format Safari & Chrome compatibility
+  const getSupportedAudioMimeType = () => {
+    if (typeof MediaRecorder === 'undefined') return '';
+    const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac'];
+    return candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
+  };
+
   const startRecording = async () => {
     try {
+      if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+        alert('Fitur perekaman suara tidak didukung pada browser ini atau membutuhkan koneksi aman HTTPS.');
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mimeType = getSupportedAudioMimeType();
+      const options = mimeType ? { mimeType } : undefined;
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -195,7 +223,11 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const detectedMime = mediaRecorder.mimeType || mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: detectedMime });
+        if (audioUrl) {
+          URL.revokeObjectURL(audioUrl);
+        }
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         if (onMarkVoCompleted) {
@@ -221,9 +253,11 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
 
   const handleDownloadAudio = () => {
     if (!audioUrl) return;
+    const isMp4 = mediaRecorderRef.current?.mimeType?.includes('mp4');
+    const ext = isMp4 ? 'mp4' : 'webm';
     const a = document.createElement('a');
     a.href = audioUrl;
-    a.download = `vo-${content.id}-${Date.now().toString(36)}.webm`;
+    a.download = `vo-${content.id}-${Date.now().toString(36)}.${ext}`;
     a.click();
   };
 
@@ -268,8 +302,7 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
             <select
               value={wpm}
               onChange={e => setWpm(parseInt(e.target.value))}
-              disabled={isPlaying}
-              className="bg-transparent font-bold text-white focus:outline-none"
+              className="bg-transparent font-bold text-white focus:outline-none cursor-pointer"
             >
               <option value={130} className="bg-slate-900">130 WPM (Santai)</option>
               <option value={138} className="bg-slate-900">138 WPM</option>
@@ -341,16 +374,19 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
             </button>
           )}
 
-          {/* Download Recorded Audio if exists */}
+          {/* In-Modal Audio Preview & Download */}
           {audioUrl && !isRecording && (
-            <button
-              onClick={handleDownloadAudio}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold"
-              title="Unduh Hasil Rekaman VO"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Unduh VO</span>
-            </button>
+            <div className="flex items-center gap-1.5 bg-slate-900 border border-emerald-500/30 rounded-xl px-2 py-1">
+              <audio src={audioUrl} controls className="h-6 w-32 sm:w-44" />
+              <button
+                onClick={handleDownloadAudio}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold"
+                title="Unduh Hasil Rekaman VO"
+              >
+                <Download className="w-3 h-3" />
+                <span className="hidden sm:inline">Unduh</span>
+              </button>
+            </div>
           )}
 
           {/* Font Size Selector */}
@@ -420,13 +456,17 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
 
       {/* COUNTDOWN OVERLAY */}
       {countdown !== null && (
-        <div className="absolute inset-0 z-40 bg-black/80 flex items-center justify-center animate-fadeIn">
+        <div 
+          onClick={() => { setCountdown(null); setIsPlaying(true); }}
+          className="absolute inset-0 z-40 bg-black/80 flex items-center justify-center animate-fadeIn cursor-pointer"
+          title="Klik atau tekan Spasi untuk langsung mulai"
+        >
           <div className="text-center space-y-4">
             <span className="text-8xl sm:text-9xl font-extrabold text-cyan-400 animate-bounce block">
               {countdown}
             </span>
             <p className="text-sm font-semibold tracking-widest text-slate-400 uppercase">
-              Tarik napas & siap membaca...
+              Tarik napas & siap membaca... (Klik / Spasi untuk Langsung Mulai)
             </p>
           </div>
         </div>
@@ -441,21 +481,19 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
           ▲ FOKUS PANDANGAN BACA (EYE-LINE)
         </span>
         <span className="text-[10px] font-mono text-indigo-400/40">
-          TEMPO: {wpm} WPM
+          TEMPO: {wpm} WPM (▲/▼ Arrow)
         </span>
       </div>
 
       {/* MAIN SCRIPT READING CANVAS */}
       <main
         ref={scrollContainerRef}
-        className={`flex-1 overflow-y-auto px-6 sm:px-16 md:px-28 lg:px-44 py-40 scroll-smooth transition-transform ${
-          isMirrored ? 'scale-x-[-1]' : ''
-        }`}
+        className="flex-1 overflow-y-auto px-6 sm:px-16 md:px-28 lg:px-44 py-36 scroll-smooth"
         style={{ scrollBehavior: 'auto' }}
       >
         {viewMode === 'stages' ? (
           /* 4-STAGE STRUCTURED FORMAT */
-          <div className="max-w-4xl mx-auto space-y-16">
+          <div className={`max-w-4xl mx-auto space-y-16 transition-transform ${isMirrored ? 'scale-x-[-1]' : ''}`}>
             
             {/* STAGE 1: HOOK */}
             <div className="space-y-4 border-l-4 border-cyan-500 pl-6 sm:pl-8">
@@ -518,18 +556,18 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
             </div>
 
             {/* SPACER AT BOTTOM */}
-            <div className="h-96 flex items-center justify-center text-center text-slate-600 text-sm font-mono pt-12">
+            <div className="h-72 flex items-center justify-center text-center text-slate-600 text-sm font-mono pt-12">
               — SELESAI NASKAH SHORTS ZEINITY —
             </div>
 
           </div>
         ) : (
           /* CONTINUOUS TEXT FORMAT */
-          <div className="max-w-4xl mx-auto space-y-8">
+          <div className={`max-w-4xl mx-auto space-y-8 transition-transform ${isMirrored ? 'scale-x-[-1]' : ''}`}>
             <p className={`${fontClasses[fontSize]} text-slate-100 leading-relaxed font-normal tracking-wide`}>
               {scriptText}
             </p>
-            <div className="h-96 flex items-center justify-center text-center text-slate-600 text-sm font-mono pt-12">
+            <div className="h-72 flex items-center justify-center text-center text-slate-600 text-sm font-mono pt-12">
               — SELESAI NASKAH SHORTS ZEINITY —
             </div>
           </div>
@@ -540,7 +578,7 @@ export const TeleprompterModal: React.FC<TeleprompterModalProps> = ({
       <footer className="bg-[#0b0d17]/90 border-t border-slate-800/80 px-6 py-2.5 flex items-center justify-between text-xs text-slate-400 z-20">
         <div className="flex items-center gap-4">
           <span className="hidden sm:inline">
-            Pintasan: <strong>Spasi</strong> = Putar/Jeda | <strong>R</strong> = Reset | <strong>Esc</strong> = Keluar
+            Pintasan: <strong>Spasi</strong> = Putar/Jeda | <strong>▲/▼</strong> = Tempo | <strong>R</strong> = Reset | <strong>Esc</strong> = Keluar
           </span>
           {isRecording && (
             <span className="text-red-400 flex items-center gap-1.5 font-semibold animate-pulse">

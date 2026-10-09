@@ -444,11 +444,17 @@ function getFallbackHookAlternatives(title: string, pillar: ContentPillar): stri
 }
 
 function getFallbackEndingAlternatives(title: string, hookText: string, pillar: ContentPillar): string[] {
+  const cleanTitle = (title || '').replace(/[?]/g, '').trim();
+  const cleanHook = (hookText || cleanTitle || '').trim();
+  const hookWords = cleanHook.split(/\s+/).filter(Boolean);
+  const hookOpeningSnippet = hookWords.length > 0 ? hookWords.slice(0, 3).join(' ') : cleanTitle;
+
   return [
-    `Dan itulah alasan kenapa kamu harus langsung cek setelan ponselmu sebelum...`,
-    `Jadi sekarang kamu paham kenapa semua pengguna membicarakan perubahan ini dari awal...`,
-    `Langsung periksa setelan ponselmu sekarang sebelum fitur otomatis ini aktif permanen.`,
-    `Simpan video ini sekarang dan bagikan ke temanmu agar tidak kaget dengan aturan baru ini.`
+    `Dan sebelum setelan otomatis ini aktif permanen di perangkatmu, ingat bahwa ${hookOpeningSnippet}...`,
+    `Terapkan langkah-langkah tadi sekarang, karena seperti yang sudah kita buktikan bahwa ${hookOpeningSnippet}...`,
+    `Langsung buka dan periksa setelan ponselmu hari ini juga sebelum aturan baru ini diterapkan permanen.`,
+    `Simpan video ini dan bagikan ke temanmu sekarang agar tidak terlambat mengamankan akun dari perubahan ini.`
   ];
 }
+
 
