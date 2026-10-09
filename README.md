@@ -9,10 +9,10 @@
 
 ## 🌟 Ikhtisar Produk
 
-**Zeinity Creator Studio** dirancang khusus untuk memfasilitasi alur kerja produksi YouTube Shorts dari hulu ke hilir secara terpadu:
+**Zeinity Creator Studio** adalah aplikasi web berorientasi dashboard (*Desktop & Mobile Responsive*) yang dirancang khusus untuk memfasilitasi alur kerja produksi YouTube Shorts dari hulu ke hilir secara terpadu:
 1. **Signal & Idea Intake (24–72 jam terakhir)**
-2. **Fact-Checking & Verifikasi Sumber Resmi**
-3. **Penyusunan Naskah 4-Tahap (90–140 kata) & Validator Formula Judul**
+2. **Fact-Checking & Verifikasi Sumber Resmi / Changelog**
+3. **Penyusunan Naskah 4-Tahap (90–140 kata) & Live Title Validator**
 4. **Perencanaan Visual Storyboard & Safe-Zone Simulator 9:16 (1080×1920)**
 5. **Quality Control Production Checklist & Asset Library**
 6. **Penjadwalan Terstruktur (Senin, Kamis & Minggu pukul 07:00 WIB)**
@@ -24,7 +24,19 @@ Aplikasi ini 100% gratis, responsif, berkinerja instan dengan arsitektur **Offli
 
 ## 🚀 Fitur Unggulan
 
-### 1. Creator Command Center (Dashboard)
+### 1. Dashboard Sidebar Navigation Layout
+- **Fixed Left Sidebar:** Menghadirkan kesan *production workstation* yang profesional seperti YouTube Studio / Premiere Pro.
+- **Brand Identity:** Logo Zeinity Shorts dengan aksen gradien Indigo/Cyan.
+- **Aksi Cepat:** Tombol menonjol `+ Produksi Short Baru`.
+- **Menu Navigasi:**
+  - 📊 **Command Center:** Ringkasan status, antrean produksi, dan metrik retensi channel.
+  - 🗓️ **Pipeline & Kalender:** Kanban 8 tahap, kalender jadwal publikasi, dan dense list view.
+  - 💡 **Idea Bank:** Bank ide topik baru sebelum masuk tahap riset mendalam.
+  - 📈 **Performance & Learning:** Analisis performa antar pilar dan logbook pembelajaran editorial.
+- **Pintasan 9Router AI Gateway & Widget Jadwal Mingguan.**
+- **Indikator Status Cloud:** Menampilkan status koneksi Supabase secara langsung di sidebar.
+
+### 2. Creator Command Center
 - Status pipeline seluruh video secara real-time.
 - Countdown dan pengingat jadwal publikasi resmi: **Senin, Kamis, dan Minggu pukul 07:00 WIB**.
 - Pemisahan eksplisit antara **Tenggat Produksi (Editing Deadline)** dan **Jadwal Publikasi (Publish Date)**.
@@ -33,13 +45,13 @@ Aplikasi ini 100% gratis, responsif, berkinerja instan dengan arsitektur **Offli
   - **Hook Health (Viewed vs Swiped):** Target ≥ 70%
   - **Retensi (Average Percentage Viewed / APV):** Target 90%–110%
 
-### 2. Content Pipeline & Kalender Rilis
+### 3. Content Pipeline & Kalender Rilis
 - **Tampilan Kanban Board:** Alur kerja 8 fase (*Ide → Riset → Penulisan → Siap Produksi → Editing → Review → Terjadwal → Terbit*).
 - **Tampilan Kalender Rilis:** Penanda slot rilis mingguan dan batas waktu editing.
 - **Tampilan Tabel Ringkas:** Dense view dengan inline editor status dan indikator jumlah kata.
 - **Filter Komprehensif:** Berdasarkan 5 Pilar Konten (*Internet & Medsos, AI & Tech, Digital Economy, Gaming, Modern Life*) dan 4 Format Shorts (*Flash News, Quick Breakdown, Actionable Tip, Myth Buster*).
 
-### 3. Unified Content Workspace (Studio per Video)
+### 4. Unified Content Workspace (Studio per Video)
 Setiap video memiliki satu ruang kerja mendalam dengan 5 tab alur kerja terpadu:
 - **Tab 1: Riset & Fakta**
   - Penyimpanan URL dokumen resmi, changelog, dan tanggal sumber.
@@ -65,13 +77,13 @@ Setiap video memiliki satu ruang kerja mendalam dengan 5 tab alur kerja terpadu:
   - Smart Benchmark Badges: *Viral Hook (≥70%)*, *Seamless Loop Berhasil (>100% APV)*, dsb.
   - *Editorial Learning Logbook:* Catatan *What Worked*, *What Failed*, dan *Next Experiment*.
 
-### 4. Integrasi 9Router AI Gateway (dengan Combos)
+### 5. Integrasi 9Router AI Gateway (dengan Combos)
 - Terhubung langsung ke gateway 9Router lokal/remote via endpoint OpenAI-compatible (`http://localhost:20128/v1`).
 - Mendukung fitur **Combos** (rantai multi-model fallback cascade).
 - Asisten khusus workflow Zeinity: *Topic Discovery, Script Drafter, Title Variations, Fact Check*.
 - Tetap dilengkapi *Smart Local Rule-based Generator* bawaan jika gateway sedang offline.
 
-### 5. Supabase Cloud Sync & Portabilitas Data
+### 6. Supabase Cloud Sync & Portabilitas Data
 - **Offline-First:** Langsung aktif bekerja tanpa konfigurasi database cloud.
 - **Supabase Cloud Sync:** Klien membaca `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY` dari file `.env` atau menu Pengaturan di UI.
 - **Skema SQL:** File `supabase/schema.sql` siap disalin ke SQL Editor Supabase Dashboard.
@@ -88,18 +100,24 @@ Setiap video memiliki satu ruang kerja mendalam dengan 5 tab alur kerja terpadu:
 
 ### Langkah Cepat:
 
-1. **Jalankan dependensi (sudah terinstal):**
+1. **Clone repository:**
+   ```bash
+   git clone https://github.com/zenqyverse/zeinity-creator-studio-shorts.git
+   cd zeinity-creator-studio-shorts
+   ```
+
+2. **Jalankan dependensi:**
    ```bash
    npm install
    ```
 
-2. **Jalankan development server:**
+3. **Jalankan development server:**
    ```bash
    npm run dev
    ```
    Buka browser di `http://localhost:5173`.
 
-3. **Build untuk production:**
+4. **Build untuk production:**
    ```bash
    npm run build
    ```
@@ -111,24 +129,22 @@ Setiap video memiliki satu ruang kerja mendalam dengan 5 tab alur kerja terpadu:
 Buat berkas `.env` di folder root (atau gunakan template dari `.env.example`):
 
 ```env
-# Supabase Cloud Sync (Opsional - Dapatkan gratis di supabase.com)
+# Supabase Cloud Sync (Dapatkan gratis di supabase.com)
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=your-supabase-publishable-key
 
 # 9Router AI Gateway
 VITE_NINEROUTER_BASE_URL=http://localhost:20128/v1
-VITE_NINEROUTER_API_KEY=
+VITE_NINEROUTER_API_KEY=your-9router-api-key
 VITE_NINEROUTER_COMBO=zeinity-combo
 ```
-
-*Catatan: Anda juga dapat memasukkan kredensial ini kapan saja langsung melalui tombol Pengaturan (ikon roda gigi) di dalam aplikasi.*
 
 ---
 
 ## 📦 Skema Database Supabase
 
 Untuk mengaktifkan sinkronisasi cloud Supabase:
-1. Buka proyek Anda di [supabase.com](https://supabase.com).
+1. Buka dashboard proyek Anda di [supabase.com](https://supabase.com).
 2. Masuk ke menu **SQL Editor**.
-3. Buka file `supabase/schema.sql` di proyek ini, salin seluruh kodenya, lalu klik **Run**.
+3. Buka file `supabase/schema.sql` di repositori ini, salin seluruh kodenya, lalu klik **Run**.
 4. Masukkan Project URL dan Anon Key ke file `.env` atau menu Pengaturan studio.
