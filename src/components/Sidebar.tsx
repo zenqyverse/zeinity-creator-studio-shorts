@@ -27,6 +27,7 @@ interface SidebarProps {
   onOpenAiAssistant: () => void;
   settings: AppSettings;
   isSupabaseConnected: boolean;
+  isNineRouterOnline?: boolean | null;
   contents: ContentItem[];
 }
 
@@ -38,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAiAssistant,
   settings,
   isSupabaseConnected,
+  isNineRouterOnline,
   contents
 }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -226,7 +228,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Cpu className="w-4 h-4 text-purple-400" />
                 <span>9Router AI Gateway</span>
               </div>
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              <div className="flex items-center gap-1.5">
+                {isNineRouterOnline ? (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/60" title="9Router Gateway Aktif" />
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-amber-400/70" title="Mode Fallback Formula Lokal Aktif" />
+                )}
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              </div>
             </button>
           </div>
 

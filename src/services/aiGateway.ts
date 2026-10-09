@@ -1,9 +1,19 @@
 // =======================================================
 // ZEINITY CREATOR STUDIO — 9ROUTER AI GATEWAY SERVICE
-// Integrasi AI Gateway dengan dukungan Combos & Local Fallback
+// =======================================================
+// 9Router adalah open-source AI Gateway lokal yang berjalan
+// di localhost:20128. Ia menyediakan OpenAI-compatible API
+// dengan fitur utama:
+//  - Combos: named routing strategy (multi-tier fallback)
+//  - /api/health : health check endpoint
+//  - /v1/models  : daftar combo/model yang tersedia
+//  - /v1/chat/completions : OpenAI-compatible chat endpoint
+// Authentication: Authorization: Bearer <api_key>
+// Model field diisi dengan nama Combo yang dikonfigurasi
+// di dashboard 9Router (http://localhost:20128)
 // =======================================================
 
-import { ContentPillar, ContentFormat, ContentItem } from '../types';
+import { ContentPillar, ContentFormat } from '../types';
 import { CONTENT_PILLARS, CONTENT_FORMATS } from '../constants/zeinityRules';
 
 export interface AiGatewayConfig {
@@ -13,6 +23,24 @@ export interface AiGatewayConfig {
 }
 
 export function getDefaultAiConfig(): AiGatewayConfig {
+  // 1. Cek dari localStorage jika pengguna telah mengubah pengaturan
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('zeinity_settings_v1') : null;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.nineRouterBaseUrl) {
+        return {
+          baseUrl: parsed.nineRouterBaseUrl,
+          apiKey: parsed.nineRouterApiKey || '',
+          comboName: parsed.nineRouterCombo || 'zeinity-combo'
+        };
+      }
+    }
+  } catch {
+    // Abaikan jika running di non-browser atau JSON parsing error
+  }
+
+  // 2. Fallback ke environment variables / default bawaan
   return {
     baseUrl: (import.meta as any).env?.VITE_NINEROUTER_BASE_URL || 'http://localhost:20128/v1',
     apiKey: (import.meta as any).env?.VITE_NINEROUTER_API_KEY || '',
@@ -38,10 +66,107 @@ Prinsip utama Zeinity:
 8. DILARANG membuat fakta bohong (halusinasi). Jika fakta belum pasti, nyatakan sebagai perlu verifikasi.
 `;
 
+// -------------------------------------------------------
+// CORE UTILITIES — Health Check & Model Discovery
+// -------------------------------------------------------
+
+/**
+ * Cek status gateway 9Router via GET /api/health.
+ * 9Router mengekspos endpoint ini tanpa autentikasi.
+ * Returns: { online: boolean; version?: string; message: string }
+ */
+export async function testNineRouterHealth(
+  config: AiGatewayConfig
+): Promise<{ online: boolean; version?: string; message: string }> {
+  // Derive base host from the baseUrl (strip /v1 suffix)
+  const baseHost = config.baseUrl.replace(/\/v1\/?$/, '').replace(/\/+$/, '');
+  const healthUrl = `${baseHost}/api/health`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const resp = await fetch(healthUrl, {
+      method: 'GET',
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (resp.ok) {
+      let version: string | undefined;
+      try {
+        const data = await resp.json();
+        version = data?.version || data?.v;
+      } catch {
+        // health endpoint might just return 200 OK text
+      }
+      return { online: true, version, message: '9Router aktif & siap digunakan.' };
+    }
+
+    return {
+      online: false,
+      message: `9Router merespons HTTP ${resp.status}. Gateway mungkin belum siap.`
+    };
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err?.name === 'AbortError') {
+      return { online: false, message: 'Timeout: 9Router tidak merespons dalam 8 detik. Pastikan sudah dijalankan.' };
+    }
+    return {
+      online: false,
+      message: 'Tidak bisa terhubung ke 9Router. Pastikan gateway sudah berjalan (npx 9router / npm start).'
+    };
+  }
+}
+
+/**
+ * Ambil daftar model/combo yang tersedia di 9Router via GET /v1/models.
+ * Returns array of model id strings, e.g. ["zeinity-combo", "gpt-4o", ...]
+ */
+export async function fetchAvailableModels(
+  config: AiGatewayConfig
+): Promise<string[]> {
+  const url = `${config.baseUrl.replace(/\/+$/, '')}/models`;
+  const headers: Record<string, string> = {};
+  if (config.apiKey) {
+    headers['Authorization'] = `Bearer ${config.apiKey}`;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const resp = await fetch(url, { method: 'GET', headers, signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    // OpenAI-compatible: { data: [{ id: "model-name", ... }] }
+    if (Array.isArray(data?.data)) {
+      return data.data.map((m: any) => String(m.id)).filter(Boolean);
+    }
+    // Some 9Router versions return array directly
+    if (Array.isArray(data)) {
+      return data.map((m: any) => String(m.id || m)).filter(Boolean);
+    }
+    return [];
+  } catch {
+    clearTimeout(timeoutId);
+    return [];
+  }
+}
+
+// -------------------------------------------------------
+// MAIN CHAT COMPLETION — callNineRouter
+// -------------------------------------------------------
+
 export async function callNineRouter(
   config: AiGatewayConfig,
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
-  temperature = 0.7
+  temperature = 0.7,
+  maxTokens = 1024
 ): Promise<string> {
   const url = `${config.baseUrl.replace(/\/+$/, '')}/chat/completions`;
 
@@ -56,18 +181,47 @@ export async function callNineRouter(
   const payload = {
     model: config.comboName || 'zeinity-combo',
     messages,
-    temperature
+    temperature,
+    max_tokens: maxTokens
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload)
-  });
+  // 30-second timeout agar UI tidak hang jika gateway lambat
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err?.name === 'AbortError') {
+      throw new Error('9Router timeout (30s). Gateway lambat merespons — coba lagi atau periksa koneksi provider.');
+    }
+    throw new Error('Tidak bisa terhubung ke 9Router. Pastikan gateway sudah berjalan di ' + config.baseUrl);
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => '');
-    throw new Error(`9Router Gateway error (${response.status}): ${errorText || response.statusText}`);
+    // Provide actionable error messages per status code
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(`9Router: API Key tidak valid atau tidak dikenali (${response.status}). Periksa API Key di Pengaturan.`);
+    }
+    if (response.status === 404) {
+      throw new Error(`9Router: Combo/Model "${config.comboName}" tidak ditemukan (404). Periksa nama Combo di dashboard 9Router.`);
+    }
+    if (response.status === 429) {
+      throw new Error('9Router: Rate limit tercapai (429). Semua provider di Combo sedang penuh — coba lagi dalam beberapa saat.');
+    }
+    if (response.status >= 500) {
+      throw new Error(`9Router: Gateway error (${response.status}). Semua provider mungkin tidak merespons — periksa konfigurasi provider di dashboard.`);
+    }
+    throw new Error(`9Router error (${response.status}): ${errorText || response.statusText}`);
   }
 
   const data = await response.json();

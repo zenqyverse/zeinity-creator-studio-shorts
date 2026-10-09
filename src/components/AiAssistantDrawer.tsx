@@ -12,7 +12,10 @@ import {
   Plus,
   RefreshCw,
   Zap,
-  Repeat
+  Repeat,
+  Activity,
+  AlertTriangle,
+  ExternalLink
 } from 'lucide-react';
 import { ContentPillar, ContentFormat, ContentItem, AppSettings } from '../types';
 import { CONTENT_PILLARS, CONTENT_FORMATS } from '../constants/zeinityRules';
@@ -22,7 +25,8 @@ import {
   draftZeinityScript, 
   generateHookAlternatives,
   generateEndingLoopAlternatives,
-  callNineRouter 
+  callNineRouter,
+  testNineRouterHealth
 } from '../services/aiGateway';
 import { createNewShort } from '../services/storage';
 
@@ -74,6 +78,50 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
   const [generatedScript, setGeneratedScript] = useState<any>(null);
 
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  // 9Router Gateway Live Health Status
+  const [gatewayHealth, setGatewayHealth] = useState<{
+    checked: boolean;
+    loading: boolean;
+    online: boolean;
+    message: string;
+    version?: string;
+  }>({
+    checked: false,
+    loading: false,
+    online: false,
+    message: ''
+  });
+
+  // Check 9Router health when drawer is opened or settings change
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    let isMounted = true;
+    setGatewayHealth(prev => ({ ...prev, loading: true }));
+
+    const config = {
+      baseUrl: settings.nineRouterBaseUrl,
+      apiKey: settings.nineRouterApiKey,
+      comboName: settings.nineRouterCombo
+    };
+
+    testNineRouterHealth(config).then(res => {
+      if (isMounted) {
+        setGatewayHealth({
+          checked: true,
+          loading: false,
+          online: res.online,
+          message: res.message,
+          version: res.version
+        });
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, settings.nineRouterBaseUrl, settings.nineRouterApiKey]);
 
   // Pre-populate input states from active content when opened
   React.useEffect(() => {
@@ -239,10 +287,29 @@ Tolong berikan:
             <Cpu className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-              9Router AI Assistant
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                9Router AI Assistant
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              </h3>
+              {/* Gateway Live Status Pill */}
+              {gatewayHealth.loading ? (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-800/80">
+                  <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                  cek...
+                </span>
+              ) : gatewayHealth.checked && gatewayHealth.online ? (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-emerald-300 bg-emerald-500/15 border border-emerald-500/30" title={gatewayHealth.message}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+                  Online
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-amber-300 bg-amber-500/15 border border-amber-500/30" title="9Router belum menyala, template lokal aktif">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  Fallback
+                </span>
+              )}
+            </div>
             <span className="text-[11px] font-mono text-slate-400">
               Combo: <strong className="text-purple-300">{settings.nineRouterCombo}</strong>
             </span>
@@ -256,6 +323,22 @@ Tolong berikan:
           <X className="w-5 h-5" />
         </button>
       </div>
+
+      {/* Gateway Offline Notice Banner */}
+      {gatewayHealth.checked && !gatewayHealth.online && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-3.5 py-2 flex items-center justify-between text-[11px] text-amber-200">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="truncate">9Router belum terdeteksi. Formula template lokal aktif.</span>
+          </div>
+          <button
+            onClick={onOpenSettings}
+            className="text-[10px] text-amber-300 underline hover:text-white font-medium shrink-0 ml-2"
+          >
+            Pengaturan
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="bg-[#121422] px-3 border-b border-slate-800 flex items-center gap-1 text-xs overflow-x-auto scrollbar-none">

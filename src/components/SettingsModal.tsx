@@ -12,11 +12,14 @@ import {
   BookOpen,
   Save,
   KeyRound,
-  ExternalLink
+  ExternalLink,
+  RefreshCw,
+  Activity,
+  List
 } from 'lucide-react';
 import { AppSettings, ContentItem } from '../types';
 import { testSupabaseConnection } from '../services/supabaseClient';
-import { callNineRouter } from '../services/aiGateway';
+import { testNineRouterHealth, fetchAvailableModels } from '../services/aiGateway';
 import { exportDatabaseToJson } from '../services/storage';
 import { STARTER_SHORTS } from '../services/starterData';
 
@@ -42,6 +45,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
   const [supabaseTestStatus, setSupabaseTestStatus] = useState<{ loading: boolean; message?: string; success?: boolean } | null>(null);
   const [nineRouterTestStatus, setNineRouterTestStatus] = useState<{ loading: boolean; message?: string; success?: boolean } | null>(null);
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [isFetchingModels, setIsFetchingModels] = useState(false);
   const [activeTab, setActiveTab] = useState<'cloud' | 'ai' | 'backup' | 'guide'>('cloud');
 
   if (!isOpen) return null;
@@ -63,19 +68,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const handleTestNineRouter = async () => {
     setNineRouterTestStatus({ loading: true });
-    try {
-      const config = {
-        baseUrl: localSettings.nineRouterBaseUrl,
-        apiKey: localSettings.nineRouterApiKey,
-        comboName: localSettings.nineRouterCombo
-      };
-      await callNineRouter(config, [
-        { role: 'user', content: 'Ping test. Jawab "9Router OK" dalam 2 kata.' }
-      ]);
-      setNineRouterTestStatus({ loading: false, success: true, message: 'Koneksi ke 9Router AI Gateway & Combo berhasil!' });
-    } catch (err: any) {
-      setNineRouterTestStatus({ loading: false, success: false, message: err?.message || 'Gagal menghubungi 9Router.' });
-    }
+    const config = {
+      baseUrl: localSettings.nineRouterBaseUrl,
+      apiKey: localSettings.nineRouterApiKey,
+      comboName: localSettings.nineRouterCombo
+    };
+    const result = await testNineRouterHealth(config);
+    setNineRouterTestStatus({
+      loading: false,
+      success: result.online,
+      message: result.online
+        ? `${result.message}${result.version ? ` (v${result.version})` : ''}`
+        : result.message
+    });
+  };
+
+  const handleFetchModels = async () => {
+    setIsFetchingModels(true);
+    const config = {
+      baseUrl: localSettings.nineRouterBaseUrl,
+      apiKey: localSettings.nineRouterApiKey,
+      comboName: localSettings.nineRouterCombo
+    };
+    const models = await fetchAvailableModels(config);
+    setAvailableModels(models);
+    setIsFetchingModels(false);
   };
 
   const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,13 +242,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TAB 2: 9ROUTER AI GATEWAY */}
           {activeTab === 'ai' && (
             <div className="space-y-4">
-              <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 space-y-1">
-                <span className="font-semibold text-white block">9Router AI Gateway & Combos:</span>
-                <p className="text-[11px] leading-relaxed">
-                  9Router bertindak sebagai AI Gateway lokal/remote dengan fitur "Combos" (urutan multi-model fallback cascade). Jika 9Router belum menyala, sistem otomatis memakai template formula cerdas Zeinity.
+              {/* Info block */}
+              <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-white flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-purple-400" />
+                    9Router AI Gateway
+                  </span>
+                  <a
+                    href="http://localhost:20128"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[10px] text-purple-300 hover:text-white border border-purple-500/30 px-2 py-0.5 rounded-lg transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Buka Dashboard
+                  </a>
+                </div>
+                <p className="text-[11px] leading-relaxed text-purple-200/90">
+                  9Router adalah AI Gateway lokal (biasanya di <code className="bg-slate-900/70 px-1 rounded text-cyan-300">localhost:20128</code>) yang menyediakan <strong>Combos</strong> — rantai multi-model fallback otomatis antar 40+ provider AI. Jika gateway tidak aktif, Zeinity Studio otomatis menggunakan template formula lokal.
                 </p>
+                <ul className="text-[10px] text-purple-300/80 space-y-0.5 pl-3 list-disc">
+                  <li>Jalankan 9Router: <code className="bg-slate-900/70 px-1 rounded text-cyan-300">npx 9router</code> atau via installer</li>
+                  <li>Buat Combo di dashboard, lalu salin namanya ke field di bawah</li>
+                  <li>API Key tersedia di tab <strong>API Keys</strong> di dashboard 9Router</li>
+                </ul>
               </div>
 
+              {/* Base URL */}
               <div>
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">
                   9Router Endpoint Base URL
@@ -241,53 +279,106 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   value={localSettings.nineRouterBaseUrl}
                   onChange={e => setLocalSettings({ ...localSettings, nineRouterBaseUrl: e.target.value })}
                   placeholder="http://localhost:20128/v1"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500"
                 />
+                <p className="text-[10px] text-slate-500 mt-1">Format: <code>http://localhost:20128/v1</code> (termasuk /v1 di akhir)</p>
               </div>
 
+              {/* API Key */}
               <div>
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                  9Router API Key (Opsional / Kosongkan jika Local Proxy)
+                  9Router API Key
                 </label>
                 <input
                   type="password"
                   value={localSettings.nineRouterApiKey}
                   onChange={e => setLocalSettings({ ...localSettings, nineRouterApiKey: e.target.value })}
-                  placeholder="sk-..."
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
+                  placeholder="sk-xxxxxxxxxxxxxxxx-ocd8hb-xxxxxxxx"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500"
                 />
+                <p className="text-[10px] text-slate-500 mt-1">Salin dari tab "API Keys" di dashboard 9Router. Kosongkan untuk gateway tanpa autentikasi.</p>
               </div>
 
+              {/* Combo Name */}
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                  Nama Model / Combos (Fallback Tier)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-semibold text-slate-300">
+                    Nama Combo (Model Routing)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleFetchModels}
+                    disabled={isFetchingModels}
+                    className="flex items-center gap-1 text-[10px] text-purple-300 hover:text-white border border-purple-500/30 px-2 py-0.5 rounded-lg transition-colors"
+                  >
+                    {isFetchingModels
+                      ? <RefreshCw className="w-3 h-3 animate-spin" />
+                      : <List className="w-3 h-3" />
+                    }
+                    {isFetchingModels ? 'Mengambil...' : 'Cari Combo'}
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={localSettings.nineRouterCombo}
                   onChange={e => setLocalSettings({ ...localSettings, nineRouterCombo: e.target.value })}
                   placeholder="zeinity-combo"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500"
                 />
+                {availableModels.length > 0 && (
+                  <div className="mt-2 p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                    <p className="text-[10px] text-slate-400 mb-1.5 font-semibold">Combo/Model tersedia di gateway:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {availableModels.map(m => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => setLocalSettings({ ...localSettings, nineRouterCombo: m })}
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md border transition-all ${
+                            localSettings.nineRouterCombo === m
+                              ? 'bg-purple-600 text-white border-purple-500'
+                              : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-purple-500/50 hover:text-purple-300'
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {availableModels.length === 0 && !isFetchingModels && (
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Klik "Cari Combo" untuk mengambil daftar combo dari gateway — atau ketik nama combo langsung.
+                  </p>
+                )}
               </div>
 
-              <div className="flex items-center gap-3 pt-2">
+              {/* Test button & status */}
+              <div className="flex flex-col gap-2 pt-1">
                 <button
                   type="button"
                   onClick={handleTestNineRouter}
                   disabled={nineRouterTestStatus?.loading}
-                  className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold transition-all"
+                  className="flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold transition-all"
                 >
-                  {nineRouterTestStatus?.loading ? 'Menghubungi...' : 'Uji 9Router Gateway'}
+                  {nineRouterTestStatus?.loading
+                    ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Memeriksa Gateway...</>
+                    : <><Activity className="w-3.5 h-3.5" /> Uji Koneksi 9Router (Health Check)</>
+                  }
                 </button>
 
-                {nineRouterTestStatus && (
-                  <span className={`text-[11px] flex items-center gap-1 ${
-                    nineRouterTestStatus.success ? 'text-emerald-400 font-semibold' : 'text-amber-400'
+                {nineRouterTestStatus && !nineRouterTestStatus.loading && (
+                  <div className={`p-2.5 rounded-xl text-[11px] flex items-start gap-2 ${
+                    nineRouterTestStatus.success
+                      ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-300'
+                      : 'bg-amber-500/10 border border-amber-500/20 text-amber-300'
                   }`}>
-                    {nineRouterTestStatus.success ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
-                    {nineRouterTestStatus.message}
-                  </span>
+                    {nineRouterTestStatus.success
+                      ? <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                      : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    }
+                    <span className="leading-relaxed">{nineRouterTestStatus.message}</span>
+                  </div>
                 )}
               </div>
             </div>

@@ -17,6 +17,7 @@ import {
 } from './services/storage';
 import { STARTER_SHORTS } from './services/starterData';
 import { testSupabaseConnection } from './services/supabaseClient';
+import { testNineRouterHealth } from './services/aiGateway';
 import { Sparkles, Plus, Cpu, Cloud, CloudOff } from 'lucide-react';
 
 export function App() {
@@ -27,8 +28,9 @@ export function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
+  const [isNineRouterOnline, setIsNineRouterOnline] = useState<boolean | null>(null);
 
-  // Periksa koneksi Supabase di awal
+  // Periksa koneksi Supabase & 9Router di awal
   useEffect(() => {
     if (settings.supabaseUrl && settings.supabaseAnonKey) {
       testSupabaseConnection(settings.supabaseUrl, settings.supabaseAnonKey).then(res => {
@@ -37,7 +39,15 @@ export function App() {
     } else {
       setIsSupabaseConnected(false);
     }
-  }, [settings.supabaseUrl, settings.supabaseAnonKey]);
+
+    testNineRouterHealth({
+      baseUrl: settings.nineRouterBaseUrl,
+      apiKey: settings.nineRouterApiKey,
+      comboName: settings.nineRouterCombo
+    }).then(res => {
+      setIsNineRouterOnline(res.online);
+    });
+  }, [settings.supabaseUrl, settings.supabaseAnonKey, settings.nineRouterBaseUrl, settings.nineRouterApiKey, settings.nineRouterCombo]);
 
   // Simpan konten saat berubah
   const handleSaveContent = (updated: ContentItem) => {
@@ -134,6 +144,7 @@ export function App() {
         onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
         settings={settings}
         isSupabaseConnected={isSupabaseConnected}
+        isNineRouterOnline={isNineRouterOnline}
         contents={contents}
       />
 
@@ -168,10 +179,24 @@ export function App() {
             {/* 9Router Quick Trigger */}
             <button
               onClick={() => setIsAiAssistantOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-medium transition-all"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
+                isNineRouterOnline
+                  ? 'bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border-purple-500/30'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+              }`}
+              title={isNineRouterOnline ? '9Router Gateway Aktif' : '9Router Offline (Template Formula Zeinity Aktif)'}
             >
               <Cpu className="w-3.5 h-3.5 text-purple-400" />
               <span>9Router AI</span>
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  isNineRouterOnline === null
+                    ? 'bg-slate-500'
+                    : isNineRouterOnline
+                    ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50'
+                    : 'bg-amber-400'
+                }`}
+              />
               <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
             </button>
 

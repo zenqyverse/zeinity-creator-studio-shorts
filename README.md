@@ -77,10 +77,12 @@ Setiap video memiliki satu ruang kerja mendalam dengan 5 tab alur kerja terpadu:
   - Smart Benchmark Badges: *Viral Hook (≥70%)*, *Seamless Loop Berhasil (>100% APV)*, dsb.
   - *Editorial Learning Logbook:* Catatan *What Worked*, *What Failed*, dan *Next Experiment*.
 
-### 5. Integrasi 9Router AI Gateway (dengan Combos)
+### 5. Integrasi 9Router AI Gateway (dengan Combos & Health Monitoring)
 - Terhubung langsung ke gateway 9Router lokal/remote via endpoint OpenAI-compatible (`http://localhost:20128/v1`).
-- Mendukung fitur **Combos** (rantai multi-model fallback cascade).
-- Asisten khusus workflow Zeinity: *Topic Discovery, Script Drafter, Title Variations, Fact Check*.
+- **Health Check & Discovery Otomatis:** Memeriksa `/api/health` dan mengambil daftar model/combo yang aktif via `/v1/models` langsung dari dialog pengaturan.
+- **Indikator Status Real-Time:** Menampilkan status koneksi gateway (Online vs Mode Fallback) di sidebar, header dashboard, dan drawer asisten.
+- Mendukung fitur **Combos** (rantai multi-model fallback cascade 3-tier).
+- Asisten khusus workflow Zeinity: *Topic Discovery, Script Drafter, Title Variations, Hook & Seamless Loop Generator, Fact Check*.
 - Tetap dilengkapi *Smart Local Rule-based Generator* bawaan jika gateway sedang offline.
 
 ### 6. Supabase Cloud Sync & Portabilitas Data
