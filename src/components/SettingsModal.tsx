@@ -52,7 +52,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [useCustomComboInput, setUseCustomComboInput] = useState(false);
   const [activeTab, setActiveTab] = useState<'cloud' | 'ai' | 'backup' | 'guide'>('cloud');
 
-  if (!isOpen) return null;
+  // Sinkronisasi data saat modal dibuka
+  useEffect(() => {
+    if (isOpen) {
+      setLocalSettings(settings);
+    }
+  }, [isOpen, settings]);
 
   const handleSave = () => {
     onSaveSettings(localSettings);
@@ -140,6 +145,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       reader.readAsText(file);
     }
   };
+
+  // Render guard diletakkan SETELAH semua hooks selesai dieksekusi
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto animate-fadeIn">

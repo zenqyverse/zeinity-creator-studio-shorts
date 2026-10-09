@@ -41,7 +41,7 @@ export function getSupabaseClient(overrideUrl?: string, overrideKey?: string): S
 
 export async function testSupabaseConnection(url: string, key: string): Promise<{ success: boolean; message: string }> {
   try {
-    const client = createClient(url, key);
+    const client = getSupabaseClient(url, key) || createClient(url, key, { auth: { persistSession: false } });
     // Coba query sederhana ke tabel contents
     const { error } = await client.from('contents').select('id').limit(1);
     if (error) {
