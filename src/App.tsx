@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { PipelineView } from './components/PipelineView';
 import { IdeaBankView } from './components/IdeaBankView';
@@ -17,6 +17,7 @@ import {
 } from './services/storage';
 import { STARTER_SHORTS } from './services/starterData';
 import { testSupabaseConnection } from './services/supabaseClient';
+import { Sparkles, Plus, Cpu, Cloud, CloudOff } from 'lucide-react';
 
 export function App() {
   const [contents, setContents] = useState<ContentItem[]>(() => getStoredContents());
@@ -102,10 +103,30 @@ export function App() {
     if (activeShort) setActiveShort(null);
   };
 
+  const pageTitles: Record<typeof currentTab, { title: string; subtitle: string }> = {
+    dashboard: {
+      title: 'Creator Command Center',
+      subtitle: 'Pusat kendali operasional & metrik kesehatan YouTube Shorts'
+    },
+    pipeline: {
+      title: 'Pipeline & Kalender Produksi',
+      subtitle: 'Kanban alur kerja 8 fase & kalender rilis Senin-Kamis-Minggu 07:00 WIB'
+    },
+    ideas: {
+      title: 'Idea Bank & Topic Intake',
+      subtitle: 'Tampungan sinyal digital 24–72 jam terakhir sebelum verifikasi fakta'
+    },
+    analytics: {
+      title: 'Performance & Learning Center',
+      subtitle: 'Evaluasi rasio Hook (≥70%) & APV (90%–110%) serta logbook editorial'
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#090a10] text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Top Navigation */}
-      <Navbar
+    <div className="min-h-screen bg-[#090a10] text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
+      
+      {/* Sidebar Dashboard Navigation */}
+      <Sidebar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         onNewShort={handleCreateNewShort}
@@ -113,59 +134,111 @@ export function App() {
         onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
         settings={settings}
         isSupabaseConnected={isSupabaseConnected}
+        contents={contents}
       />
 
-      {/* Main Workspace Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
-        {currentTab === 'dashboard' && (
-          <Dashboard
-            contents={contents}
-            onOpenShort={item => setActiveShort(item)}
-            onNewShort={handleCreateNewShort}
-            onNavigateTab={tab => setCurrentTab(tab)}
-          />
-        )}
-
-        {currentTab === 'pipeline' && (
-          <PipelineView
-            contents={contents}
-            onOpenShort={item => setActiveShort(item)}
-            onNewShort={handleCreateNewShort}
-            onUpdateStatus={handleUpdateStatus}
-          />
-        )}
-
-        {currentTab === 'ideas' && (
-          <IdeaBankView
-            contents={contents}
-            onOpenShort={item => setActiveShort(item)}
-            onSaveContent={handleSaveContent}
-            onDeleteContent={handleDeleteContent}
-            onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
-          />
-        )}
-
-        {currentTab === 'analytics' && (
-          <AnalyticsView
-            contents={contents}
-            onOpenShort={item => setActiveShort(item)}
-          />
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-[#07080d] py-6 px-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-400">Zeinity Creator Studio</span>
-            <span>—</span>
-            <span className="italic text-slate-400">"Paham Dunia Digital dalam 60 Detik"</span>
+      {/* Main Workspace Canvas (with left padding for sidebar on desktop) */}
+      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
+        
+        {/* Top Header Bar on Desktop */}
+        <header className="hidden lg:flex sticky top-0 z-30 bg-[#0c0e17]/85 backdrop-blur-md border-b border-slate-800/80 px-8 py-4 items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              {pageTitles[currentTab].title}
+            </h2>
+            <p className="text-[11px] text-slate-400">
+              {pageTitles[currentTab].subtitle}
+            </p>
           </div>
-          <div className="text-[11px] font-mono text-slate-600">
-            Jadwal Publikasi: Senin, Kamis & Minggu 07:00 WIB • Target APV: 90%–110%
+
+          <div className="flex items-center gap-3">
+            {/* Supabase status indicator */}
+            <div 
+              onClick={() => setIsSettingsOpen(true)}
+              className={`cursor-pointer flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono border transition-all ${
+                isSupabaseConnected
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+              }`}
+            >
+              {isSupabaseConnected ? <Cloud className="w-3.5 h-3.5 text-emerald-400" /> : <CloudOff className="w-3.5 h-3.5 text-slate-500" />}
+              <span>{isSupabaseConnected ? 'Cloud Synced' : 'Offline Mode'}</span>
+            </div>
+
+            {/* 9Router Quick Trigger */}
+            <button
+              onClick={() => setIsAiAssistantOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-medium transition-all"
+            >
+              <Cpu className="w-3.5 h-3.5 text-purple-400" />
+              <span>9Router AI</span>
+              <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+            </button>
+
+            {/* Create Short Button */}
+            <button
+              onClick={handleCreateNewShort}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Short Baru</span>
+            </button>
           </div>
-        </div>
-      </footer>
+        </header>
+
+        {/* Content Body */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+          {currentTab === 'dashboard' && (
+            <Dashboard
+              contents={contents}
+              onOpenShort={item => setActiveShort(item)}
+              onNewShort={handleCreateNewShort}
+              onNavigateTab={tab => setCurrentTab(tab)}
+            />
+          )}
+
+          {currentTab === 'pipeline' && (
+            <PipelineView
+              contents={contents}
+              onOpenShort={item => setActiveShort(item)}
+              onNewShort={handleCreateNewShort}
+              onUpdateStatus={handleUpdateStatus}
+            />
+          )}
+
+          {currentTab === 'ideas' && (
+            <IdeaBankView
+              contents={contents}
+              onOpenShort={item => setActiveShort(item)}
+              onSaveContent={handleSaveContent}
+              onDeleteContent={handleDeleteContent}
+              onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
+            />
+          )}
+
+          {currentTab === 'analytics' && (
+            <AnalyticsView
+              contents={contents}
+              onOpenShort={item => setActiveShort(item)}
+            />
+          )}
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-900 bg-[#07080d] py-6 px-4 lg:px-8 text-xs text-slate-500">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-slate-400">Zeinity Creator Studio</span>
+              <span>—</span>
+              <span className="italic text-slate-400">"Paham Dunia Digital dalam 60 Detik"</span>
+            </div>
+            <div className="text-[11px] font-mono text-slate-600">
+              Jadwal Publikasi: Senin, Kamis & Minggu 07:00 WIB • Target APV: 90%–110%
+            </div>
+          </div>
+        </footer>
+
+      </div>
 
       {/* Unified Content Production Workspace Modal */}
       {activeShort && (

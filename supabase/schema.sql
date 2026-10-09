@@ -3,12 +3,9 @@
 -- Database Schema khusus YouTube Shorts Production
 -- =======================================================
 
--- Aktifkan ekstensi UUID
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- 1. TABEL UTAMA KONTEN (CONTENTS)
 CREATE TABLE IF NOT EXISTS contents (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     title VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'idea',
     pillar VARCHAR(50) NOT NULL,
@@ -24,7 +21,6 @@ CREATE TABLE IF NOT EXISTS contents (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index untuk filter cepat
 CREATE INDEX IF NOT EXISTS idx_contents_status ON contents(status);
 CREATE INDEX IF NOT EXISTS idx_contents_pillar ON contents(pillar);
 CREATE INDEX IF NOT EXISTS idx_contents_format ON contents(format);
@@ -32,8 +28,8 @@ CREATE INDEX IF NOT EXISTS idx_contents_publish_date ON contents(publish_date);
 
 -- 2. TABEL RISET & BUKTI FAKTA (RESEARCH_SOURCES)
 CREATE TABLE IF NOT EXISTS research_sources (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    content_id TEXT NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
     platform_or_topic VARCHAR(255) NOT NULL,
     source_url TEXT,
     source_date DATE,
@@ -51,8 +47,8 @@ CREATE INDEX IF NOT EXISTS idx_research_content ON research_sources(content_id);
 
 -- 3. TABEL NASKAH & SKRIP (SCRIPTS)
 CREATE TABLE IF NOT EXISTS scripts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    content_id TEXT NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
     stage_hook TEXT DEFAULT '',
     stage_context TEXT DEFAULT '',
     stage_payoff TEXT DEFAULT '',
@@ -65,16 +61,16 @@ CREATE TABLE IF NOT EXISTS scripts (
 
 -- 4. TABEL STORYBOARD & VISUAL SHOTS (STORYBOARDS)
 CREATE TABLE IF NOT EXISTS storyboards (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    content_id TEXT NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
     shots JSONB DEFAULT '[]'::jsonb,
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 5. TABEL PRODUCTION CHECKLIST & ASSETS (CHECKLISTS)
 CREATE TABLE IF NOT EXISTS checklists (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    content_id TEXT NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
     vo_recorded BOOLEAN DEFAULT FALSE,
     broll_1080p_ready BOOLEAN DEFAULT FALSE,
     captions_contrast_ok BOOLEAN DEFAULT FALSE,
@@ -89,8 +85,8 @@ CREATE TABLE IF NOT EXISTS checklists (
 
 -- 6. TABEL ANALITIK & EVALUASI SHORTS (ANALYTICS)
 CREATE TABLE IF NOT EXISTS analytics (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    content_id TEXT NOT NULL UNIQUE REFERENCES contents(id) ON DELETE CASCADE,
     shown_in_feed INT DEFAULT 0,
     views INT DEFAULT 0,
     viewed_percent NUMERIC(5, 2) DEFAULT 0.0,
@@ -108,7 +104,6 @@ CREATE TABLE IF NOT EXISTS analytics (
 );
 
 -- 7. ROW LEVEL SECURITY (RLS) POLICIES
--- Untuk kemudahan instalasi, izinkan anon membaca dan menulis data
 ALTER TABLE contents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE research_sources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE scripts ENABLE ROW LEVEL SECURITY;
@@ -116,6 +111,15 @@ ALTER TABLE storyboards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE checklists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
 
+-- Drop policy lama jika sudah ada (mencegah error saat run ulang)
+DROP POLICY IF EXISTS "Allow public read-write for contents" ON contents;
+DROP POLICY IF EXISTS "Allow public read-write for research_sources" ON research_sources;
+DROP POLICY IF EXISTS "Allow public read-write for scripts" ON scripts;
+DROP POLICY IF EXISTS "Allow public read-write for storyboards" ON storyboards;
+DROP POLICY IF EXISTS "Allow public read-write for checklists" ON checklists;
+DROP POLICY IF EXISTS "Allow public read-write for analytics" ON analytics;
+
+-- Buat policy baru
 CREATE POLICY "Allow public read-write for contents" ON contents FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public read-write for research_sources" ON research_sources FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public read-write for scripts" ON scripts FOR ALL USING (true) WITH CHECK (true);
