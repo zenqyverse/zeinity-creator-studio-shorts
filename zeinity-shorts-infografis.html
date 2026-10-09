@@ -1,0 +1,3036 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zeinity Shorts — Infografis Strategi & Identitas Channel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       CSS VARIABLES & THEME DEFINITIONS (GLASSMORPHISM)
+       ========================================================================== */
+    :root {
+      /* Base Colors - Dark Theme (Default) */
+      --bg-base: #0a0e17;
+      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                         radial-gradient(circle at 85% 25%, rgba(236, 72, 153, 0.15) 0%, transparent 45%),
+                         radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+                         #080c14;
+      --glass-bg: rgba(16, 24, 40, 0.65);
+      --glass-bg-hover: rgba(26, 37, 60, 0.75);
+      --glass-card: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-border-glow: rgba(99, 102, 241, 0.4);
+      --glass-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      /* Brand Accents */
+      --accent-primary: #6366f1;
+      --accent-primary-glow: rgba(99, 102, 241, 0.35);
+      --accent-secondary: #06b6d4;
+      --accent-pink: #ec4899;
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+
+      /* Safe Zone Colors */
+      --safe-top: rgba(239, 68, 68, 0.35);
+      --safe-center: rgba(16, 185, 129, 0.25);
+      --safe-bottom: rgba(239, 68, 68, 0.35);
+
+      --blur-val: blur(16px);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f0f4f9;
+      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                         radial-gradient(circle at 85% 25%, rgba(236, 72, 153, 0.08) 0%, transparent 45%),
+                         radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                         #edf2f7;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-bg-hover: rgba(255, 255, 255, 0.85);
+      --glass-card: rgba(255, 255, 255, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --glass-border-glow: rgba(99, 102, 241, 0.3);
+      --glass-shadow: 0 10px 25px -5px rgba(100, 116, 139, 0.15), 0 0 1px 1px rgba(255, 255, 255, 0.8);
+
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+
+      --accent-primary: #4f46e5;
+      --accent-primary-glow: rgba(79, 70, 229, 0.25);
+      --accent-secondary: #0891b2;
+      --accent-pink: #db2777;
+
+      --safe-top: rgba(239, 68, 68, 0.2);
+      --safe-center: rgba(16, 185, 129, 0.2);
+      --safe-bottom: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.4s ease, color 0.4s ease;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background Ambient Glowing Orbs */
+    .ambient-orbs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: floatOrb 20s infinite alternate ease-in-out;
+    }
+    .orb-1 {
+      width: 450px;
+      height: 450px;
+      background: #6366f1;
+      top: -100px;
+      left: -50px;
+      animation-duration: 22s;
+    }
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: #ec4899;
+      top: 30%;
+      right: -80px;
+      animation-duration: 26s;
+    }
+    .orb-3 {
+      width: 500px;
+      height: 500px;
+      background: #06b6d4;
+      bottom: -150px;
+      left: 20%;
+      animation-duration: 30s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 30px) scale(1.08); }
+      100% { transform: translate(-30px, 60px) scale(0.95); }
+    }
+
+    /* Main Container */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    /* ==========================================================================
+       GLASS COMPONENTS (CARDS, BUTTONS, BADGES)
+       ========================================================================== */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-val);
+      -webkit-backdrop-filter: var(--blur-val);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-shadow);
+      transition: all var(--transition-normal);
+    }
+    .glass-panel:hover {
+      border-color: var(--glass-border-glow);
+    }
+
+    .glass-card {
+      background: var(--glass-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
+    }
+    .glass-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--glass-border-glow);
+      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.25), 0 0 15px var(--accent-primary-glow);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--accent-secondary);
+    }
+    .badge-primary {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    .badge-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--text-main);
+      backdrop-filter: blur(8px);
+      transition: all var(--transition-fast);
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px var(--accent-primary-glow);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      box-shadow: 0 4px 20px var(--accent-primary-glow);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ==========================================================================
+       HEADER & NAVIGATION
+       ========================================================================== */
+    .sticky-nav {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      margin-bottom: 24px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: white;
+      box-shadow: 0 4px 16px var(--accent-primary-glow);
+      flex-shrink: 0;
+    }
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-text p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Theme Toggle Switch */
+    .theme-toggle-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      transition: all var(--transition-fast);
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--accent-primary);
+      transform: scale(1.05);
+    }
+
+    /* Sub-nav quick pill selector */
+    .quick-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 4px;
+      margin-bottom: 24px;
+      scrollbar-width: none;
+    }
+    .quick-pills::-webkit-scrollbar {
+      display: none;
+    }
+    .pill-link {
+      white-space: nowrap;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      backdrop-filter: blur(8px);
+    }
+    .pill-link:hover, .pill-link.active {
+      background: var(--accent-primary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 15px var(--accent-primary-glow);
+    }
+
+    /* ==========================================================================
+       HERO BANNER
+       ========================================================================== */
+    .hero-section {
+      padding: 36px 32px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+    .hero-title-area .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .hero-title-area h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text-main) 40%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .positioning-box {
+      border-left: 4px solid var(--accent-primary);
+      padding: 12px 18px;
+      background: rgba(99, 102, 241, 0.08);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 20px;
+      font-style: italic;
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
+    .hero-stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .stat-mini-card {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      min-width: 140px;
+    }
+    .stat-mini-card .val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-secondary);
+      line-height: 1.1;
+    }
+    .stat-mini-card .lbl {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-interactive-card {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+    }
+    .live-clock-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    /* Section Title Standard */
+    .section-header {
+      margin-bottom: 22px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title-wrap h3 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title-wrap p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    .section-spacing {
+      margin-bottom: 48px;
+    }
+
+    /* ==========================================================================
+       SECTION 01: PRINSIP & AUDIENS
+       ========================================================================== */
+    .principle-card {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .principle-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      opacity: 0.4;
+      line-height: 1;
+    }
+    .principle-card h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .principle-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Audience Matrix */
+    .audience-box {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+    }
+    .audience-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .audience-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .audience-item strong {
+      color: var(--text-main);
+    }
+    .icon-check {
+      color: var(--accent-success);
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .icon-cross {
+      color: var(--accent-danger);
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ==========================================================================
+       SECTION 02: 5 CONTENT PILLARS (INTERACTIVE DECK)
+       ========================================================================== */
+    .pillar-tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+    .pillar-tab-btn {
+      flex: 1;
+      min-width: 170px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      transition: all var(--transition-normal);
+      text-align: left;
+    }
+    .pillar-tab-btn:hover {
+      border-color: var(--glass-border-glow);
+      background: var(--glass-bg-hover);
+      transform: translateY(-2px);
+    }
+    .pillar-tab-btn.active {
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--text-main);
+      box-shadow: 0 4px 20px var(--accent-primary-glow);
+    }
+    .pillar-tab-btn .tab-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .pillar-tab-btn .tab-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .pillar-detail-card {
+      padding: 28px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+    }
+    .pillar-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .pillar-detail-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+    }
+    .pillar-scope-box h5, .pillar-samples-box h5 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-secondary);
+      margin-bottom: 10px;
+    }
+    .sample-pill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sample-pill-item {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ==========================================================================
+       SECTION 03: 4 FORMAT SHORTS & TIMELINE PLAYER
+       ========================================================================== */
+    .formats-interactive-container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+    .format-selector-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .format-btn-item {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+    .format-btn-item:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--accent-primary);
+    }
+    .format-btn-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 18px var(--accent-primary-glow);
+    }
+    .format-btn-item .duration-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--accent-secondary);
+      font-weight: 700;
+    }
+    .format-btn-item .format-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .format-viewer-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .format-timeline-visual {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+    }
+    .timeline-bar-wrapper {
+      position: relative;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      display: flex;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      border: 1px solid var(--glass-border);
+    }
+    .timeline-slice {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+      position: relative;
+      transition: filter 0.2s;
+    }
+    .timeline-slice:hover {
+      filter: brightness(1.2);
+    }
+    .slice-hook { background: linear-gradient(90deg, #ec4899, #f43f5e); }
+    .slice-body { background: linear-gradient(90deg, #6366f1, #3b82f6); }
+    .slice-payoff { background: linear-gradient(90deg, #06b6d4, #0ea5e9); }
+    .slice-cta { background: linear-gradient(90deg, #10b981, #059669); }
+
+    .playback-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .time-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .stage-steps-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .stage-step-card {
+      padding: 12px 14px;
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+    }
+    .stage-step-card .step-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-pink);
+      font-weight: 700;
+    }
+    .stage-step-card .step-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin: 4px 0;
+    }
+    .stage-step-card .step-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       SECTION 04: SCRIPT ECONOMY & WORD/PACE CALCULATOR
+       ========================================================================== */
+    .script-calculator-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+    }
+    .calculator-input-box {
+      padding: 24px;
+    }
+    .calculator-textarea {
+      width: 100%;
+      height: 140px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.92rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color var(--transition-fast);
+      margin-top: 12px;
+    }
+    .calculator-textarea:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 15px var(--accent-primary-glow);
+    }
+
+    .calculator-metrics-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .metric-gauge-card {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+    }
+    .gauge-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .gauge-val {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .gauge-bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px 0;
+      position: relative;
+    }
+    .gauge-bar-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 999px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .gauge-status-msg {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* 4-Stage Script Formula Cards */
+    .stages-formula-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .stage-card-item {
+      padding: 18px 16px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stage-card-item .stg-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-secondary);
+      font-weight: 700;
+    }
+    .stage-card-item h5 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .stage-card-item p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ==========================================================================
+       SECTION 05: FORMULA JUDUL & LIVE VALIDATOR
+       ========================================================================== */
+    .title-builder-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .title-presets-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .formula-pill-btn {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--transition-fast);
+    }
+    .formula-pill-btn:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--accent-primary);
+    }
+    .formula-pill-btn.active {
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.12);
+      box-shadow: 0 4px 15px var(--accent-primary-glow);
+    }
+    .formula-pill-btn .f-tag {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--accent-secondary);
+      text-transform: uppercase;
+    }
+    .formula-pill-btn .f-tmpl {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 4px 0 2px;
+      color: var(--text-main);
+    }
+    .formula-pill-btn .f-ex {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .title-validator-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .title-input-wrapper {
+      position: relative;
+    }
+    .title-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+    .title-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 15px var(--accent-primary-glow);
+    }
+
+    .validator-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .val-check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    /* Mobile Overlay Simulation */
+    .phone-text-overlay-preview {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px dashed var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      text-align: center;
+      position: relative;
+      margin-top: 10px;
+    }
+    .overlay-hook-text {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #facc15;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 90%;
+    }
+
+    /* ==========================================================================
+       SECTION 06: 9:16 SAFE ZONE SIMULATOR
+       ========================================================================== */
+    .safezone-container {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+    /* Phone Mockup Canvas */
+    .phone-mockup {
+      width: 320px;
+      height: 568px; /* 9:16 ratio proportion */
+      background: #000000;
+      border-radius: 36px;
+      border: 6px solid #1e293b;
+      position: relative;
+      overflow: hidden;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 16px;
+      background: #0f172a;
+      border-radius: 12px;
+      z-index: 20;
+    }
+    /* Safe zone slices inside phone */
+    .zone-top {
+      height: 15%; /* Top 15% */
+      background: var(--safe-top);
+      border-bottom: 2px dashed rgba(239, 68, 68, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fca5a5;
+      text-transform: uppercase;
+      z-index: 5;
+      padding-top: 14px;
+      text-align: center;
+      transition: opacity 0.3s;
+    }
+    .zone-center {
+      height: 60%; /* Center 60% */
+      background: var(--safe-center);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #6ee7b7;
+      text-align: center;
+      padding: 16px;
+      position: relative;
+      z-index: 5;
+      transition: opacity 0.3s;
+    }
+    .zone-bottom {
+      height: 25%; /* Bottom 25% */
+      background: var(--safe-bottom);
+      border-top: 2px dashed rgba(239, 68, 68, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fca5a5;
+      text-transform: uppercase;
+      z-index: 5;
+      padding-bottom: 10px;
+      text-align: center;
+      transition: opacity 0.3s;
+    }
+
+    /* Mock Shorts UI overlay inside phone */
+    .mock-shorts-ui {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 16px 20px;
+      transition: opacity 0.3s;
+    }
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: white;
+    }
+    .mock-actions-sidebar {
+      position: absolute;
+      right: 12px;
+      bottom: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .mock-action-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: white;
+    }
+    .mock-bottom-info {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 60px;
+      color: white;
+    }
+    .mock-channel-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .mock-sub-pill {
+      background: #dc2626;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .mock-caption-row {
+      font-size: 0.7rem;
+      opacity: 0.9;
+      line-height: 1.2;
+    }
+
+    /* Safe zone control switches */
+    .safezone-info-card {
+      padding: 28px;
+    }
+    .safezone-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    /* ==========================================================================
+       SECTION 07: PIPELINE PRODUKSI & JADWAL MINGGUAN
+       ========================================================================== */
+    .schedule-cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .schedule-card {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .schedule-day {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .day-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-secondary);
+    }
+    .day-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+    .schedule-theme {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+    .schedule-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* 6-Step Pipeline Tracker */
+    .pipeline-wrapper {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+    }
+    .pipeline-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      position: relative;
+    }
+    .pipeline-step-item {
+      padding: 16px 14px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .pipeline-step-item:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+    }
+    .pipeline-step-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 18px var(--accent-primary-glow);
+    }
+    .pipeline-num-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--glass-border);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .pipeline-step-item.active .pipeline-num-badge {
+      background: var(--accent-primary);
+      color: white;
+    }
+    .pipeline-step-name {
+      font-size: 0.84rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .pipeline-detail-box {
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* ==========================================================================
+       SECTION 08: METRIK EVALUASI (ALGORITHM HEALTH CALCULATOR)
+       ========================================================================== */
+    .metrics-calculator-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+    }
+    .calculator-sliders-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .slider-control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .slider-label-row span {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .slider-label-row .slider-val-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--accent-secondary);
+    }
+    .range-input {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      box-shadow: 0 0 10px var(--accent-primary-glow);
+      cursor: pointer;
+      border: 2px solid white;
+    }
+
+    .verdict-gauge-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+    .verdict-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid var(--accent-success);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+      transition: all var(--transition-normal);
+    }
+    .verdict-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .verdict-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+    .verdict-explanation {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       SECTION 09: 5 RISIKO FATAL (PRE-PUBLISH CHECKLIST)
+       ========================================================================== */
+    .checklist-wrapper {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .check-item-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+    .check-item-box:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-glow);
+    }
+    .check-item-box.checked {
+      border-color: var(--accent-success);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all var(--transition-fast);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .check-item-box.checked .custom-checkbox {
+      background: var(--accent-success);
+      border-color: var(--accent-success);
+      color: white;
+    }
+
+    /* ==========================================================================
+       SECTION 10: OFFICIAL PROFILE & COPY TOOL
+       ========================================================================== */
+    .profile-card-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+    .profile-summary-box {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 8px 24px var(--accent-primary-glow);
+    }
+    .about-copy-box {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .about-text-content {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      white-space: pre-wrap;
+      color: var(--text-muted);
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    /* Toast Notification */
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      background: rgba(16, 24, 40, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--accent-success);
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+    .toast-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 0.84rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--glass-border);
+      margin-top: 40px;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .formats-interactive-container,
+      .script-calculator-grid,
+      .title-builder-grid,
+      .safezone-container,
+      .metrics-calculator-grid,
+      .profile-card-grid {
+        grid-template-columns: 1fr;
+      }
+      .grid-4, .grid-5, .stages-formula-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .pipeline-steps-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .schedule-cards-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-container {
+        padding: 14px 12px 60px;
+      }
+      .hero-section {
+        padding: 22px 18px;
+      }
+      .hero-title-area h2 {
+        font-size: 1.6rem;
+      }
+      .grid-2, .grid-3, .grid-4, .grid-5, .stages-formula-row, .pipeline-steps-grid {
+        grid-template-columns: 1fr;
+      }
+      .phone-mockup {
+        width: 100%;
+        max-width: 290px;
+        height: 515px;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <!-- Ambient Glowing Orbs -->
+  <div class="ambient-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- STICKY GLASS NAVBAR -->
+    <header class="sticky-nav glass-panel">
+      <div class="brand-area">
+        <div class="brand-logo">Z</div>
+        <div class="brand-text">
+          <h1>ZEINITY <span class="badge badge-primary">SHORTS</span></h1>
+          <p>Bite-Sized Digital & Modern Life Insights</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <button id="copyAboutBtn" class="btn btn-primary btn-sm">
+          📋 Salin Deskripsi
+        </button>
+      </div>
+    </header>
+
+    <!-- QUICK JUMP PILLS -->
+    <nav class="quick-pills" aria-label="Quick Navigation">
+      <a href="#identitas" class="pill-link active">🎯 Identitas</a>
+      <a href="#pilar" class="pill-link">🏛️ 5 Pilar Konten</a>
+      <a href="#format" class="pill-link">⏱️ 4 Format Shorts</a>
+      <a href="#naskah" class="pill-link">📝 Naskah & Durasi</a>
+      <a href="#judul" class="pill-link">🔍 Formula Judul</a>
+      <a href="#safezone" class="pill-link">📱 9:16 Safe Zone</a>
+      <a href="#pipeline" class="pill-link">🚀 Pipeline & Jadwal</a>
+      <a href="#metrik" class="pill-link">📊 Metrik Algoritma</a>
+      <a href="#risiko" class="pill-link">⚠️ 5 Risiko Fatal</a>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section glass-panel">
+      <div class="hero-grid">
+        <div class="hero-title-area">
+          <div class="hero-eyebrow">
+            <span class="badge badge-primary">Single Source of Truth</span>
+            <span class="badge badge-success">≤ 60 Detik</span>
+            <span class="badge">YouTube Shorts First</span>
+          </div>
+          <h2>Paham Dunia Digital Tanpa Basa-Basi.</h2>
+          <div class="positioning-box">
+            "Pusat update dan fakta esensial seputar dunia digital dan kehidupan modern tanpa basa-basi—padat, jelas, visual, dan tuntas dalam waktu di bawah 60 detik."
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.92rem;">
+            Zeinity berfokus pada kurasi dan literasi digital terapan: membedah ekosistem digital secara menyeluruh dengan pendekatan to-the-point, akurat, dan langsung terasa manfaatnya.
+          </p>
+          <div class="hero-stats-row">
+            <div class="stat-mini-card">
+              <div class="val">≤ 60s</div>
+              <div class="lbl">Durasi Maksimal</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="val">90–140</div>
+              <div class="lbl">Kata Per Naskah</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="val">≥ 70%</div>
+              <div class="lbl">Target Viewed %</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="val">3x / Mgg</div>
+              <div class="lbl">Jadwal Tayang</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-interactive-card">
+          <div class="live-clock-card">
+            <div>
+              <div style="font-size: 0.74rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Jadwal Rilis Berikutnya</div>
+              <div id="nextDropText" style="font-weight: 800; font-size: 1.15rem; color: var(--accent-secondary); margin-top: 2px;">Senin, 07:00 WIB</div>
+            </div>
+            <span class="badge badge-warning">Rutin 07:00 WIB</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+            <strong>Janji Kepada Penonton:</strong><br>
+            <em>"Di sini, kamu tetap terhubung dengan perkembangan internet, teknologi, dan gaya hidup digital terbaru tanpa perlu membaca artikel panjang atau menonton video belasan menit."</em>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="badge">@ZeinityShorts</span>
+            <span class="badge">9:16 Vertikal</span>
+            <span class="badge">Micro-Learning</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 01: PRINSIP & AUDIENS -->
+    <section id="identitas" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>🎯</span> 4 Prinsip Operasional & Target Audiens</h3>
+          <p>Fondasi utama pembuatan setiap detik konten di Zeinity</p>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom: 24px;">
+        <div class="glass-card principle-card">
+          <div class="principle-num">01</div>
+          <h4>Single-Point Focus</h4>
+          <p>Satu video hanya menyelesaikan <strong>satu pertanyaan</strong>, satu fitur, atau satu fakta konkret. Tidak memaksakan multi-argumen.</p>
+        </div>
+        <div class="glass-card principle-card">
+          <div class="principle-num">02</div>
+          <h4>Akurasi Tanpa Kompromi</h4>
+          <p>Mengutamakan <strong>changelog resmi</strong> dan rujukan primer terverifikasi, bukan rumor, tebakan, atau clickbait sensasional.</p>
+        </div>
+        <div class="glass-card principle-card">
+          <div class="principle-num">03</div>
+          <h4>Zero Dead Air</h4>
+          <p>Detik ke-0 langsung masuk ke pokok masalah. <strong>Nol intro klise</strong> ("Halo guys..."), langsung visual hook.</p>
+        </div>
+        <div class="glass-card principle-card">
+          <div class="principle-num">04</div>
+          <h4>Visual-First Delivery</h4>
+          <p>Informasi wajib didukung bukti visual: rekaman antarmuka asli, dokumen pengumuman, atau perbandingan sebelum-sesudah.</p>
+        </div>
+      </div>
+
+      <!-- Audience Matrix -->
+      <div class="grid-2">
+        <div class="glass-panel audience-box">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h4 style="font-weight: 800; font-size: 1.1rem; color: var(--accent-success);">✅ Target Audiens Utama</h4>
+            <span class="badge badge-success">Target Inti</span>
+          </div>
+          <ul class="audience-list">
+            <li class="audience-item">
+              <span class="icon-check">✓</span>
+              <div><strong>Usia 18–35 Tahun:</strong> Remaja akhir hingga dewasa muda yang aktif secara digital.</div>
+            </li>
+            <li class="audience-item">
+              <span class="icon-check">✓</span>
+              <div><strong>Digital Natives:</strong> Pengguna aktif smartphone, media sosial, AI tools, dompet digital, dan game.</div>
+            </li>
+            <li class="audience-item">
+              <span class="icon-check">✓</span>
+              <div><strong>Waktu Terbatas:</strong> Orang yang ingin update teknologi tanpa membaca artikel ribuan kata.</div>
+            </li>
+            <li class="audience-item">
+              <span class="icon-check">✓</span>
+              <div><strong>Pecinta Micro-Learning:</strong> Gemar tips ringkas, trik terapan, dan *bite-sized explainers*.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="glass-panel audience-box">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h4 style="font-weight: 800; font-size: 1.1rem; color: var(--accent-danger);">❌ Bukan Target Audiens</h4>
+            <span class="badge badge-danger">Out of Scope</span>
+          </div>
+          <ul class="audience-list">
+            <li class="audience-item">
+              <span class="icon-cross">✗</span>
+              <div><strong>Tutorial Coding Tingkat Lanjut:</strong> Penonton yang mencari pembelajaran pemrograman teknis mendalam.</div>
+            </li>
+            <li class="audience-item">
+              <span class="icon-cross">✗</span>
+              <div><strong>Review Gadget Berdurasi Panjang:</strong> Ulasan unboxing atau benchmark gadget 20 menit ke atas.</div>
+            </li>
+            <li class="audience-item">
+              <span class="icon-cross">✗</span>
+              <div><strong>Pencari Rumor & Gosip:</strong> Penonton yang mencari spekulasi tidak terverifikasi atau gosip industri.</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: 5 PILAR KONTEN (INTERACTIVE DECK) -->
+    <section id="pilar" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>🏛️</span> 5 Pilar Konten (Content Pillars)</h3>
+          <p>Eksplorasi ruang bahasan dan contoh topik terapan di setiap pilar</p>
+        </div>
+      </div>
+
+      <div class="pillar-tabs" id="pillarTabContainer">
+        <!-- Generated by JS or hardcoded interactive tabs -->
+        <button class="pillar-tab-btn active" data-pillar="0">
+          <span class="tab-badge">PILAR 1</span>
+          <span class="tab-name">🌐 Internet & Medsos</span>
+        </button>
+        <button class="pillar-tab-btn" data-pillar="1">
+          <span class="tab-badge">PILAR 2</span>
+          <span class="tab-name">🤖 AI & Technology</span>
+        </button>
+        <button class="pillar-tab-btn" data-pillar="2">
+          <span class="tab-badge">PILAR 3</span>
+          <span class="tab-name">💳 Ekonomi Digital</span>
+        </button>
+        <button class="pillar-tab-btn" data-pillar="3">
+          <span class="tab-badge">PILAR 4</span>
+          <span class="tab-name">🎮 Gaming & Hiburan</span>
+        </button>
+        <button class="pillar-tab-btn" data-pillar="4">
+          <span class="tab-badge">PILAR 5</span>
+          <span class="tab-name">🧠 Modern Life</span>
+        </button>
+      </div>
+
+      <div class="pillar-detail-card glass-panel" id="pillarDetailCard">
+        <div class="pillar-detail-header">
+          <div>
+            <span class="badge badge-primary" id="pillarBadgeText">PILAR 1</span>
+            <h4 id="pillarTitleText" style="font-size: 1.35rem; font-weight: 800; margin-top: 6px;">Internet & Social Media</h4>
+          </div>
+          <div id="pillarTagList" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="badge">TikTok</span>
+            <span class="badge">Instagram</span>
+            <span class="badge">WhatsApp</span>
+            <span class="badge">Privasi</span>
+          </div>
+        </div>
+
+        <div class="pillar-detail-grid">
+          <div class="pillar-scope-box">
+            <h5>Ruang Bahasan & Fokus Utama</h5>
+            <p id="pillarScopeText" style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;">
+              Fitur baru platform (TikTok, Instagram, YouTube, X, WhatsApp, Telegram, Discord), perubahan algoritma, aturan privasi, tren format konten, keamanan akun, dan fenomena perilaku online.
+            </p>
+          </div>
+          <div class="pillar-samples-box">
+            <h5>Contoh Fokus Video Terapan</h5>
+            <div class="sample-pill-list" id="pillarSampleList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: 4 FORMAT SHORTS & TIMELINE PLAYER -->
+    <section id="format" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>⏱️</span> 4 Format Konten Shorts & Timeline Player</h3>
+          <p>Struktur ritme dan alokasi detik untuk menjaga retensi penonton</p>
+        </div>
+      </div>
+
+      <div class="formats-interactive-container">
+        <!-- Left selector -->
+        <div class="format-selector-list" id="formatSelectorList">
+          <button class="format-btn-item active" data-fmt="0">
+            <span class="duration-tag">20–30 DETIK</span>
+            <span class="format-title">⚡ A. Flash News</span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Pembaruan resmi mendesak & implikasi</span>
+          </button>
+          <button class="format-btn-item" data-fmt="1">
+            <span class="duration-tag">30–45 DETIK</span>
+            <span class="format-title">🔍 B. Quick Breakdown</span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">1-Point Explainer cara kerja fitur baru</span>
+          </button>
+          <button class="format-btn-item" data-fmt="2">
+            <span class="duration-tag">45–60 DETIK</span>
+            <span class="format-title">🛠️ C. Actionable Tip</span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Panduan praktis langkah demi langkah</span>
+          </button>
+          <button class="format-btn-item" data-fmt="3">
+            <span class="duration-tag">30–45 DETIK</span>
+            <span class="format-title">🛡️ D. Myth Buster</span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Meluruskan misinformasi & cek fakta</span>
+          </button>
+        </div>
+
+        <!-- Right viewer -->
+        <div class="format-viewer-panel glass-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span class="badge badge-primary" id="fmtDurationBadge">20–30 DETIK</span>
+              <h4 id="fmtHeading" style="font-size: 1.25rem; font-weight: 800; margin-top: 4px;">Flash News</h4>
+            </div>
+            <p id="fmtPurpose" style="font-size: 0.85rem; color: var(--text-muted); max-width: 420px;">
+              Menyampaikan satu pembaruan resmi atau berita penting yang baru saja terjadi.
+            </p>
+          </div>
+
+          <!-- Interactive timeline visualizer bar -->
+          <div class="format-timeline-visual">
+            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted);">
+              <span>Visual Breakdown Alokasi Detik</span>
+              <span id="fmtMaxDurationLabel">Total Durasi: 30s</span>
+            </div>
+            <div class="timeline-bar-wrapper" id="timelineBarWrapper">
+              <!-- Slices populated dynamically -->
+            </div>
+            <div class="playback-controls">
+              <button id="playSimBtn" class="btn btn-sm btn-primary">▶ Simulasi Playback</button>
+              <div class="time-badge" id="simTimeDisplay">Detik: 0s / 30s</div>
+            </div>
+          </div>
+
+          <!-- Stage breakdown cards -->
+          <div class="stage-steps-list" id="fmtStepsList">
+            <!-- Dynamic step cards -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: NASKAH & WORD/PACE CALCULATOR -->
+    <section id="naskah" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>📝</span> Struktur Naskah (Script Economy) & Pace Calculator</h3>
+          <p>Aturan emas 90–140 kata dengan tempo bicara 130–160 kata/menit</p>
+        </div>
+      </div>
+
+      <div class="script-calculator-grid">
+        <div class="calculator-input-box glass-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 1.05rem; font-weight: 700;">Simulasi & Uji Naskah Shorts</h4>
+            <button id="loadSampleScriptBtn" class="btn btn-sm">Gunakan Contoh Naskah</button>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+            Ketik atau tempel draf naskahmu di sini untuk mengukur kelayakan durasi dan batas kata.
+          </p>
+          <textarea id="scriptInput" class="calculator-textarea" placeholder="Tuliskan naskah Shorts di sini... Misal: Apa kamu tahu WhatsApp baru saja menambahkan fitur kunci chat rahasia?..."></textarea>
+        </div>
+
+        <div class="calculator-metrics-panel glass-panel">
+          <div>
+            <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 12px;">Analisis Kepadatan Kata</h4>
+            <div class="metric-gauge-card">
+              <div class="gauge-header">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Total Kata</span>
+                <span class="gauge-val" id="wordCountDisplay">0</span>
+              </div>
+              <div class="gauge-bar-track">
+                <div class="gauge-bar-fill" id="wordBarFill" style="width: 0%;"></div>
+              </div>
+              <div class="gauge-status-msg" id="wordStatusMsg">Ideal: 90–140 kata (maks. 60 detik)</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="stat-mini-card">
+              <div class="val" id="estTimeDisplay">0s</div>
+              <div class="lbl">Estimasi Durasi (145 WPM)</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="val" id="densityVerdict">-</div>
+              <div class="lbl">Status Densitas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Stage Short Formula Cards -->
+      <div class="stages-formula-row">
+        <div class="stage-card-item">
+          <span class="stg-time">DETIK 0–3</span>
+          <h5>Stage 1: The Hook</h5>
+          <p>Tangkap perhatian sebelum penonton swipe. Wajib selaras teks besar di layar dan suara pertama.</p>
+          <span class="badge badge-danger">Zero Dead Air</span>
+        </div>
+        <div class="stage-card-item">
+          <span class="stg-time">DETIK 4–10</span>
+          <h5>Stage 2: Context Acceleration</h5>
+          <p>Konteks minimum dalam 1–2 kalimat singkat. Mengapa penonton harus peduli sekarang juga.</p>
+          <span class="badge badge-warning">Singkat & Padat</span>
+        </div>
+        <div class="stage-card-item">
+          <span class="stg-time">DETIK 11–45</span>
+          <h5>Stage 3: Core Payoff</h5>
+          <p>Sajikan bukti visual, demonstrasi, dan transisi visual tiap 2–3 detik agar mata tetap terkunci.</p>
+          <span class="badge badge-primary">Nilai Pokok</span>
+        </div>
+        <div class="stage-card-item">
+          <span class="stg-time">DETIK 46–60</span>
+          <h5>Stage 4: Loop / Smart CTA</h5>
+          <p>Kalimat penutup menyambung ke awal secara alami (seamless looping) atau ajakan spesifik terapan.</p>
+          <span class="badge badge-success">High Retention</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 05: FORMULA JUDUL & LIVE VALIDATOR -->
+    <section id="judul" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>🔍</span> Formula Judul & On-Screen Overlay</h3>
+          <p>Wajib kalimat tanya (Apa / Kenapa / Bagaimana) dengan rentang 5–10 kata</p>
+        </div>
+      </div>
+
+      <div class="title-builder-grid">
+        <!-- Preset Formulas -->
+        <div class="title-presets-panel glass-panel">
+          <h4 style="font-size: 1.05rem; font-weight: 700;">Pilih Template Formula</h4>
+          <div class="formula-pill-btn active" data-type="apa">
+            <span class="f-tag">Formula "Apa" — Informasi & Pembaruan</span>
+            <div class="f-tmpl">Apa Saja [Jumlah] [Fitur/Aturan] Baru di [Platform]?</div>
+            <div class="f-ex">Contoh: "Apa Saja Fitur Baru WhatsApp Bulan Ini?" (7 kata)</div>
+          </div>
+          <div class="formula-pill-btn" data-type="kenapa">
+            <span class="f-tag">Formula "Kenapa" — Fakta & Alasan Cepat</span>
+            <div class="f-tmpl">Kenapa [Aplikasi/Perangkat] Kamu Tiba-Tiba [Kondisi]?</div>
+            <div class="f-ex">Contoh: "Kenapa Aplikasi Ini Diam-Diam Pakai Kuotamu?" (6 kata)</div>
+          </div>
+          <div class="formula-pill-btn" data-type="bagaimana">
+            <span class="f-tag">Formula "Bagaimana" — Panduan & Solusi</span>
+            <div class="f-tmpl">Bagaimana Cara [Aksi Cepat] Tanpa [Kendala]?</div>
+            <div class="f-ex">Contoh: "Bagaimana Cara Mematikan Fitur Pelacak di Ponsel?" (7 kata)</div>
+          </div>
+        </div>
+
+        <!-- Live Title Validator -->
+        <div class="title-validator-panel glass-panel">
+          <h4 style="font-size: 1.05rem; font-weight: 700;">Live Validator & On-Screen Preview</h4>
+          <div class="title-input-wrapper">
+            <input type="text" id="customTitleInput" class="title-input" value="Apa Saja Fitur Baru WhatsApp Bulan Ini?">
+          </div>
+
+          <div class="validator-checklist">
+            <div class="val-check-item" id="checkQuestionWord">
+              <span id="iconCheckWord">✅</span>
+              <span>Diawali kata tanya: <strong>"Apa"</strong>, <strong>"Kenapa"</strong>, atau <strong>"Bagaimana"</strong></span>
+            </div>
+            <div class="val-check-item" id="checkWordLength">
+              <span id="iconCheckLen">✅</span>
+              <span>Panjang ideal <strong>5–10 kata</strong> (Saat ini: <strong id="titleWordCount">7</strong> kata)</span>
+            </div>
+            <div class="val-check-item">
+              <span>✅</span>
+              <span>Bebas jargon rumit & ramah layar ponsel</span>
+            </div>
+          </div>
+
+          <!-- Preview on phone screen -->
+          <div class="phone-text-overlay-preview">
+            <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Tampilan Teks Overlay Detik 0–3 (Hook Visual):</div>
+            <div class="overlay-hook-text" id="overlayPreviewText">
+              Apa Saja Fitur Baru WhatsApp Bulan Ini?
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 06: 9:16 SAFE ZONE SIMULATOR -->
+    <section id="safezone" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>📱</span> Standar Visual & 9:16 Safe Zone Simulator</h3>
+          <p>Simulasi area aman teks dan visual pada video vertikal 1080 x 1920 piksel</p>
+        </div>
+      </div>
+
+      <div class="safezone-container">
+        <!-- Interactive Phone Canvas -->
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+
+          <!-- Mock UI YouTube Shorts -->
+          <div class="mock-shorts-ui" id="mockShortsUI">
+            <div class="mock-header">
+              <span>Shorts</span>
+              <span>🔍 📷 ⋮</span>
+            </div>
+            <div class="mock-actions-sidebar">
+              <div class="mock-action-btn">👍<br><span style="font-size: 0.5rem">42K</span></div>
+              <div class="mock-action-btn">👎</div>
+              <div class="mock-action-btn">💬<br><span style="font-size: 0.5rem">820</span></div>
+              <div class="mock-action-btn">↗️</div>
+              <div class="mock-action-btn">🎵</div>
+            </div>
+            <div class="mock-bottom-info">
+              <div class="mock-channel-row">
+                <span>@ZeinityShorts</span>
+                <span class="mock-sub-pill">SUBSCRIBE</span>
+              </div>
+              <div class="mock-caption-row">
+                Fitur baru ini memangkas waktu kerja kamu secara drastis... #shorts #tech
+              </div>
+            </div>
+          </div>
+
+          <!-- Safe zone partitions -->
+          <div class="zone-top" id="zoneTopElem">
+            <div>
+              ⚠️ ATAS 15% (UNSAFE)<br>
+              <span style="font-size: 0.62rem">Tertutup Header & Audio</span>
+            </div>
+          </div>
+          <div class="zone-center" id="zoneCenterElem">
+            <div style="background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--accent-success);">
+              ⭐ GOLDEN SAFE ZONE (60%)<br>
+              <span style="font-size: 0.72rem; font-weight: normal; color: #d1fae5;">Semua teks judul, caption dinamis, dan demo layar wajib di sini!</span>
+            </div>
+          </div>
+          <div class="zone-bottom" id="zoneBottomElem">
+            <div>
+              ⚠️ BAWAH 25% (UNSAFE)<br>
+              <span style="font-size: 0.62rem">Tertutup Judul, Akun, & Tombol Like</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Safe zone info & toggles -->
+        <div class="safezone-info-card glass-panel">
+          <h4 style="font-size: 1.25rem; font-weight: 800;">Pedoman Tata Letak Visual Vertikal</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+            Setiap elemen penting harus berada dalam area <strong>Center 60%</strong> agar tidak terhalang oleh antarmuka sistem YouTube Shorts pada berbagai rasio layar ponsel (16:9, 19.5:9, 20:9).
+          </p>
+
+          <div class="safezone-controls-row">
+            <button id="toggleShortsUIBtn" class="btn btn-sm">Toggle UI YouTube</button>
+            <button id="toggleSafeZoneColorsBtn" class="btn btn-sm">Toggle Highlight Zona</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+            <div style="padding: 12px; background: var(--glass-card); border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
+              <strong style="color: var(--accent-secondary);">🔤 Dynamic Auto-Captions:</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                Tampilkan teks per <strong>2–4 kata</strong> mengikuti ritme suara, bukan satu paragraf penuh. Gunakan warna kontras tinggi (kuning/putih dengan shadow gelap).
+              </div>
+            </div>
+            <div style="padding: 12px; background: var(--glass-card); border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
+              <strong style="color: var(--accent-pink);">🎬 B-Roll & Screen Capture:</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                Gunakan rekaman antarmuka asli 1080p dengan penanda visual (lingkaran penyorot atau zoom 1.2x) pada tombol yang sedang dijelaskan.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 07: PIPELINE PRODUKSI & JADWAL MINGGUAN -->
+    <section id="pipeline" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>🚀</span> Pipeline Produksi & Jadwal Mingguan</h3>
+          <p>Alur kerja cepat 6 tahap dari sinyal berita hingga publikasi</p>
+        </div>
+      </div>
+
+      <!-- Jadwal 3x Seminggu Cards -->
+      <div class="schedule-cards-row">
+        <div class="schedule-card">
+          <div class="schedule-day">
+            <span class="day-name">SENIN</span>
+            <span class="day-time">07:00 WIB</span>
+          </div>
+          <div class="schedule-theme">🌐 Internet, Medsos, & AI Update</div>
+          <div class="schedule-desc">Fitur baru platform media sosial, rilis model AI mingguan, dan privasi data.</div>
+        </div>
+        <div class="schedule-card">
+          <div class="schedule-day">
+            <span class="day-name">KAMIS</span>
+            <span class="day-time">07:00 WIB</span>
+          </div>
+          <div class="schedule-theme">💳 Digital Economy & Gadget</div>
+          <div class="schedule-desc">Trik langganan, dark patterns belanja online, update OS, dan produktivitas.</div>
+        </div>
+        <div class="schedule-card">
+          <div class="schedule-day">
+            <span class="day-name">MINGGU</span>
+            <span class="day-time">07:00 WIB</span>
+          </div>
+          <div class="schedule-theme">🎮 Gaming & Modern Life</div>
+          <div class="schedule-desc">Budaya gaming, digital well-being, tips manajemen screen time akhir pekan.</div>
+        </div>
+      </div>
+
+      <!-- 6-Step Pipeline Tracker -->
+      <div class="pipeline-wrapper glass-panel">
+        <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 14px;">Workflow Produksi Shorts Cepat</h4>
+        <div class="pipeline-steps-grid" id="pipelineStepsGrid">
+          <div class="pipeline-step-item active" data-step="0">
+            <div class="pipeline-num-badge">1</div>
+            <div class="pipeline-step-name">Signal Ingestion</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">24–72 Jam</span>
+          </div>
+          <div class="pipeline-step-item" data-step="1">
+            <div class="pipeline-num-badge">2</div>
+            <div class="pipeline-step-name">Visual Readiness</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Cek Aset</span>
+          </div>
+          <div class="pipeline-step-item" data-step="2">
+            <div class="pipeline-num-badge">3</div>
+            <div class="pipeline-step-name">Scripting</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">90–130 kata</span>
+          </div>
+          <div class="pipeline-step-item" data-step="3">
+            <div class="pipeline-num-badge">4</div>
+            <div class="pipeline-step-name">Voiceover</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Audio Jernih</span>
+          </div>
+          <div class="pipeline-step-item" data-step="4">
+            <div class="pipeline-num-badge">5</div>
+            <div class="pipeline-step-name">Video Editing</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">60–90 Menit</span>
+          </div>
+          <div class="pipeline-step-item" data-step="5">
+            <div class="pipeline-num-badge">6</div>
+            <div class="pipeline-step-name">Publish & Engage</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Jam Pertama</span>
+          </div>
+        </div>
+
+        <div class="pipeline-detail-box" id="pipelineDetailBox">
+          <div>
+            <strong id="pipeDetailTitle" style="color: var(--accent-secondary); font-size: 0.95rem;">Tahap 1: Signal Ingestion (24–72 Jam Terakhir)</strong>
+            <p id="pipeDetailDesc" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+              Menjaring changelog resmi, rilis versi baru, isu viral yang membutuhkan pelurusan fakta, dan pengumuman platform.
+            </p>
+          </div>
+          <span class="badge badge-primary" id="pipeDetailTag">Langkah 1 dari 6</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 08: METRIK EVALUASI (ALGORITHM HEALTH CALCULATOR) -->
+    <section id="metrik" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>📊</span> Metrik Evaluasi & Shorts Analytics Simulator</h3>
+          <p>Kesehatan performa algoritma Shorts Feed dinilai dari 2 metrik krusial</p>
+        </div>
+      </div>
+
+      <div class="metrics-calculator-grid">
+        <div class="calculator-sliders-card glass-panel">
+          <h4 style="font-size: 1.1rem; font-weight: 700;">Simulasi Data YouTube Analytics</h4>
+          <p style="font-size: 0.84rem; color: var(--text-muted);">
+            Geser nilai metrik di bawah untuk menganalisis potensi penyebaran video di feed rekomendasi YouTube Shorts.
+          </p>
+
+          <div class="slider-control-group">
+            <div class="slider-label-row">
+              <span>1. Viewed vs. Swiped Away</span>
+              <span class="slider-val-display" id="viewedValDisplay">75%</span>
+            </div>
+            <input type="range" min="30" max="100" value="75" class="range-input" id="viewedSlider">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+              <span>Bahaya (&lt;60%)</span>
+              <span>Target Sehat (≥ 70%)</span>
+              <span>Super (≥ 85%)</span>
+            </div>
+          </div>
+
+          <div class="slider-control-group">
+            <div class="slider-label-row">
+              <span>2. Average Percentage Viewed (APV)</span>
+              <span class="slider-val-display" id="apvValDisplay">105%</span>
+            </div>
+            <input type="range" min="40" max="150" value="105" class="range-input" id="apvSlider">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+              <span>Drop (&lt;70%)</span>
+              <span>Target (90%–110%)</span>
+              <span>Looping Viral (&gt;110%)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="verdict-gauge-panel glass-panel">
+          <div class="verdict-circle" id="verdictCircle">
+            <div class="verdict-score" id="verdictScoreText">A+</div>
+            <div class="verdict-tag" id="verdictTagText">Viral Ready</div>
+          </div>
+          <h5 id="verdictHeadline" style="font-size: 1.1rem; font-weight: 800; color: var(--accent-success);">Peluang Viral Sangat Tinggi</h5>
+          <p class="verdict-explanation" id="verdictExplanation">
+            Hook detik 0–3 sangat kuat (Viewed ≥ 70%) dan penonton menonton ulang hingga akhir (APV &gt; 100%). Algoritma akan mendorong video ke feed audiens luas.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 09: 5 RISIKO FATAL (PRE-PUBLISH CHECKLIST) -->
+    <section id="risiko" class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>⚠️</span> 5 Risiko Fatal (The 5 Deadly Sins)</h3>
+          <p>Daftar pantangan yang harus diperiksa sebelum video dipublikasikan</p>
+        </div>
+        <div id="checklistStatusBadge" class="badge badge-primary">0 / 5 Lolos Cek</div>
+      </div>
+
+      <div class="checklist-wrapper glass-panel">
+        <div class="check-item-box" data-idx="0">
+          <div class="custom-checkbox">✓</div>
+          <div>
+            <strong style="color: var(--accent-danger);">1. Bebas Clickbait Kosong:</strong>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+              Pastikan janji di judul benar-benar terjawab secara tuntas dalam video, bukan informasi sepele yang mengecewakan penonton.
+            </div>
+          </div>
+        </div>
+
+        <div class="check-item-box" data-idx="1">
+          <div class="custom-checkbox">✓</div>
+          <div>
+            <strong style="color: var(--accent-danger);">2. Nol 'Wall of Text':</strong>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+              Hindari menampilkan paragraf panjang di layar vertikal yang tidak mungkin terbaca dalam 2 detik. Tampilkan teks 2–4 kata dinamis.
+            </div>
+          </div>
+        </div>
+
+        <div class="check-item-box" data-idx="2">
+          <div class="custom-checkbox">✓</div>
+          <div>
+            <strong style="color: var(--accent-danger);">3. Nol Intro Bertele-tele:</strong>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+              Tidak ada salam pembuka atau permintaan subscribe di detik awal. Detik ke-0 langsung to-the-point pada inti masalah.
+            </div>
+          </div>
+        </div>
+
+        <div class="check-item-box" data-idx="3">
+          <div class="custom-checkbox">✓</div>
+          <div>
+            <strong style="color: var(--accent-danger);">4. Topik Memiliki Representasi Visual Riil:</strong>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+              Tidak membahas konsep yang terlalu abstrak tanpa bukti visual antarmuka, rekaman fitur, atau dokumen yang jelas.
+            </div>
+          </div>
+        </div>
+
+        <div class="check-item-box" data-idx="4">
+          <div class="custom-checkbox">✓</div>
+          <div>
+            <strong style="color: var(--accent-danger);">5. Kualitas Audio Bersih & Jernih:</strong>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+              Suara narasi bebas dengung (*clean voiceover*), artikulasi jelas, dan musik latar tidak menenggelamkan vokal.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 10: PROFIL CHANNEL & COPY TOOL -->
+    <section class="section-spacing">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h3><span>📌</span> Profil Channel Resmi & Deskripsi Kanal</h3>
+          <p>Identitas publik resmi channel Zeinity di YouTube</p>
+        </div>
+      </div>
+
+      <div class="profile-card-grid">
+        <div class="profile-summary-box glass-panel">
+          <div class="profile-avatar">⚡</div>
+          <h4 style="font-size: 1.3rem; font-weight: 800;">Zeinity</h4>
+          <span class="badge badge-primary">@ZeinityShorts</span>
+          <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-top: 4px;">
+            "Paham Dunia Digital dalam 60 Detik."
+          </div>
+          <div style="width: 100%; border-top: 1px solid var(--glass-border); padding-top: 14px; font-size: 0.8rem; color: var(--text-dim); text-align: left;">
+            <div>📅 Rilis: Senin, Kamis, Minggu (07:00 WIB)</div>
+            <div>📱 Format: YouTube Shorts (9:16)</div>
+            <div>🎯 Niche: Literasi Digital & Gaya Hidup Modern</div>
+          </div>
+        </div>
+
+        <div class="about-copy-box glass-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 1.05rem; font-weight: 700;">Deskripsi "About" Kanal YouTube</h4>
+            <button id="copyAboutInnerBtn" class="btn btn-sm btn-primary">📋 Salin Teks</button>
+          </div>
+          <pre class="about-text-content" id="aboutTextSource">Selamat datang di Zeinity.
+
+Dunia digital dan teknologi bergerak terlalu cepat. Kami merangkum perkembangan terpenting seputar internet, AI, dan gaya hidup modern ke dalam video ringkas di bawah 60 detik—padat, jelas, dan langsung ke intinya.
+
+Apa yang kamu dapatkan di sini:
+📱 Internet & Media Sosial: Fitur baru, perubahan algoritma, dan keamanan privasi.
+🤖 AI & Gadget: Update AI praktis dan fitur smartphone yang benar-benar berguna.
+💳 Ekonomi Digital: Perubahan e-commerce, langganan digital, dan trik konsumen cerdas.
+🎮 Gaming & Hiburan: Kabar industri game, platform streaming, dan budaya digital.
+🧠 Kehidupan Modern: Literasi digital praktis, tips screen time, dan etika online.
+
+Update baru setiap Senin, Kamis, dan Minggu.
+Subscribe sekarang agar tidak ketinggalan fakta dan fitur penting di ponselmu.</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel">
+      <div style="font-weight: 700; margin-bottom: 4px;">ZEINITY SHORTS — Operational Strategy Blueprint</div>
+      <div>Berdasarkan "Dokumen Strategi Dan Identitas Channel Zeinity Shorts.md" &bull; Single Source of Truth</div>
+    </footer>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION POPUP -->
+  <div class="toast-popup" id="toastPopup">
+    <span>✅</span>
+    <span id="toastMsg">Teks berhasil disalin ke clipboard!</span>
+  </div>
+
+  <!-- ==========================================================================
+       INTERACTIVE JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    // --- 1. DATA SOURCE FROM STRATEGY DOCUMENT ---
+    const PILLARS_DATA = [
+      {
+        id: 0,
+        name: "Internet & Social Media",
+        badge: "PILAR 1",
+        tags: ["TikTok", "Instagram", "WhatsApp", "Privasi", "Algoritma"],
+        scope: "Fitur baru platform (TikTok, Instagram, YouTube, X, WhatsApp, Telegram, Discord), perubahan algoritma, aturan privasi, tren format konten, keamanan akun, dan fenomena perilaku online.",
+        samples: [
+          "Perubahan setelan privasi dan pelacakan data pengguna.",
+          "Cara kerja fitur baru yang baru saja dirilis platform populer.",
+          "Tips mengamankan akun dari pembajakan atau phishing modern."
+        ]
+      },
+      {
+        id: 1,
+        name: "AI & Technology",
+        badge: "PILAR 2",
+        tags: ["ChatGPT", "Claude", "Gemini", "Android/iOS", "Tools AI"],
+        scope: "Rilis model dan tools AI praktis (ChatGPT, Claude, Gemini, tools editing, otomatisasi), update sistem operasi (Android, iOS, Windows, macOS), gadget esensial, software produktivitas, dan literasi teknologi terapan.",
+        samples: [
+          "Fitur baru AI yang memangkas waktu kerja atau tugas sehari-hari.",
+          "Pembaruan sistem operasi dan fitur tersembunyi di smartphone.",
+          "Cara mendeteksi konten deepfake audio atau visual yang sedang marak."
+        ]
+      },
+      {
+        id: 2,
+        name: "Digital Economy & Consumer Culture",
+        badge: "PILAR 3",
+        tags: ["E-Commerce", "Fintech", "Subscriptions", "Dark Patterns"],
+        scope: "Ekosistem e-commerce, langganan digital (subscriptions), dompet digital / fintech, monetisasi kreator, trik diskon tersembunyi, biaya tersembunyi (dark patterns), dan tren belanja online.",
+        samples: [
+          "Kebijakan biaya admin atau biaya layanan baru di platform belanja/fintech.",
+          "Cara membatalkan langganan otomatis yang sulit dicari tombolnya.",
+          "Modus baru manipulasi harga pada promo belanja digital."
+        ]
+      },
+      {
+        id: 3,
+        name: "Gaming & Digital Entertainment",
+        badge: "PILAR 4",
+        tags: ["Mobile/Console", "Live Service", "Twitch/YT", "Game Ownership"],
+        scope: "Industri game mobile dan konsol, live service, ekosistem streaming (Twitch, YouTube Gaming), update game populer, layanan game pass/cloud gaming, dan regulasi aset digital.",
+        samples: [
+          "Update besar sistem atau monetisasi dalam game populer.",
+          "Kebijakan baru platform streaming yang mempengaruhi penonton/streamer.",
+          "Perubahan hak kepemilikan game digital yang dibeli pengguna."
+        ]
+      },
+      {
+        id: 4,
+        name: "Modern Life & Human Behavior",
+        badge: "PILAR 5",
+        tags: ["Digital Well-Being", "Screen Time", "Burn-Out", "Etika Online"],
+        scope: "Kebiasaan digital harian (digital well-being), manajemen screen time, etika komunikasi modern, produktivitas digital, dating apps, dan cara teknologi mengubah interaksi sehari-hari.",
+        samples: [
+          "Fitur pembatas screen time yang terbukti efektif di smartphone.",
+          "Fenomena burn-out digital dan cara memfilter notifikasi yang mengganggu.",
+          "Tips praktis menjaga batas privasi dalam komunikasi kerja daring."
+        ]
+      }
+    ];
+
+    const FORMATS_DATA = [
+      {
+        id: 0,
+        title: "Flash News",
+        duration: "20–30 Detik",
+        maxSec: 30,
+        purpose: "Menyampaikan satu pembaruan resmi atau berita penting yang baru saja terjadi.",
+        slices: [
+          { label: "Hook (0–3s)", percent: 10, class: "slice-hook", desc: "Headline berita + fakta paling mengejutkan/penting." },
+          { label: "Poin Kunci (4–20s)", percent: 57, class: "slice-body", desc: "Rincian 2–3 poin kunci yang resmi diumumkan." },
+          { label: "Implikasi (21–30s)", percent: 33, class: "slice-cta", desc: "Implikasi langsung untuk pengguna biasa." }
+        ],
+        steps: [
+          { time: "Detik 0–3", name: "Headline Hook", desc: "Berita mengejutkan / pengumuman resmi detik ini." },
+          { time: "Detik 4–20", name: "Rincian Resmi", desc: "2–3 poin kunci dari changelog atau rilis dokumen." },
+          { time: "Detik 21–30", name: "Implikasi Nyata", desc: "Apa dampak langsung bagi kehidupan penonton." }
+        ]
+      },
+      {
+        id: 1,
+        title: "Quick Breakdown / 1-Point Explainer",
+        duration: "30–45 Detik",
+        maxSec: 45,
+        purpose: "Menjelaskan cara kerja sebuah fitur baru, aturan baru, atau mekanisme digital dalam tempo cepat.",
+        slices: [
+          { label: "Hook (0–3s)", percent: 7, class: "slice-hook", desc: "Pertanyaan pemantik / hook visual kontras." },
+          { label: "Mekanisme (4–25s)", percent: 49, class: "slice-body", desc: "Penjelasan langkah/mekanisme inti disertai rekaman antarmuka." },
+          { label: "Alasan Penting (26–40s)", percent: 33, class: "slice-payoff", desc: "Mengapa hal ini penting diperhatikan penonton." },
+          { label: "Loop Ending (41–45s)", percent: 11, class: "slice-cta", desc: "Kesimpulan singkat / seamless loop ending." }
+        ],
+        steps: [
+          { time: "Detik 0–3", name: "Pertanyaan Pemantik", desc: "Hook visual kontras dan pertanyaan menggelitik." },
+          { time: "Detik 4–25", name: "Demo Mekanisme", desc: "Demonstrasi rekaman antarmuka cara kerja fitur." },
+          { time: "Detik 26–40", name: "Urgensi Nilai", desc: "Kenapa penonton wajib memahami fitur ini sekarang." },
+          { time: "Detik 41–45", name: "Loop Closing", desc: "Kalimat akhir menyambung mulus ke kalimat pertama." }
+        ]
+      },
+      {
+        id: 2,
+        title: "Actionable Tip / Quick Guide",
+        duration: "45–60 Detik",
+        maxSec: 60,
+        purpose: "Memberikan panduan praktis yang bisa langsung diterapkan penonton di perangkat mereka.",
+        slices: [
+          { label: "Problem (0–3s)", percent: 5, class: "slice-hook", desc: "Masalah yang sering dihadapi + janji solusi cepat." },
+          { label: "3 Langkah Demo (4–45s)", percent: 70, class: "slice-body", desc: "Tiga langkah praktis (disertai demo langkah di layar)." },
+          { label: "Hasil & CTA (46–60s)", percent: 25, class: "slice-cta", desc: "Hasil akhir + ajakan simpan/coba di ponsel sekarang." }
+        ],
+        steps: [
+          { time: "Detik 0–3", name: "Masalah + Janji Solusi", desc: "Sorot kendala umum yang dialami penonton." },
+          { time: "Detik 4–45", name: "3 Langkah Terapan", desc: "Tutorial cepat langkah 1, 2, 3 dengan pointer visual." },
+          { time: "Detik 46–60", name: "Hasil Akhir & CTA", desc: "Pamerkan hasil & instruksi cek pengaturan sekarang." }
+        ]
+      },
+      {
+        id: 3,
+        title: "Myth Buster / Fact Check",
+        duration: "30–45 Detik",
+        maxSec: 45,
+        purpose: "Meluruskan misinformasi atau klaim keliru seputar teknologi yang sedang viral.",
+        slices: [
+          { label: "Klaim Viral (0–3s)", percent: 7, class: "slice-hook", desc: "Tampilkan klaim viral yang keliru / narasi umum." },
+          { label: "Bukti Fakta (4–25s)", percent: 49, class: "slice-body", desc: "Bukti fakta resmi dan verifikasi teknis sebenarnya." },
+          { label: "Analisis Keliru (26–35s)", percent: 22, class: "slice-payoff", desc: "Mengapa klaim tersebut bisa salah dipahami." },
+          { label: "Panduan Aksi (36–45s)", percent: 22, class: "slice-cta", desc: "Panduan apa yang harus dilakukan penonton." }
+        ],
+        steps: [
+          { time: "Detik 0–3", name: "Sorot Klaim Viral", desc: "Tampilkan narasi salah yang beredar luas." },
+          { time: "Detik 4–25", name: "Verifikasi Resmi", desc: "Buka bukti teknis atau changelog dari sumber asli." },
+          { time: "Detik 26–35", name: "Akar Kesalahpahaman", desc: "Jelaskan mengapa publik mudah salah mengerti." },
+          { time: "Detik 36–45", name: "Panduan Solusi", desc: "Tindakan cerdas yang wajib diambil penonton." }
+        ]
+      }
+    ];
+
+    const PIPELINE_DATA = [
+      {
+        step: 0,
+        title: "Tahap 1: Signal Ingestion (24–72 Jam Terakhir)",
+        desc: "Menjaring changelog resmi, rilis versi baru, isu viral yang membutuhkan pelurusan fakta, dan pengumuman platform.",
+        tag: "Langkah 1 dari 6"
+      },
+      {
+        step: 1,
+        title: "Tahap 2: Visual-Readiness Check",
+        desc: "Memastikan topik memiliki aset visual yang jelas (antarmuka bisa direkam, dokumen resmi bisa ditampilkan secara konkret).",
+        tag: "Langkah 2 dari 6"
+      },
+      {
+        step: 2,
+        title: "Tahap 3: Scripting (90–130 Kata)",
+        desc: "Penulisan naskah dengan struktur teruji: Hook (0–3s) → Context (4–10s) → Core Payoff (11–45s) → Actionable Ending / Loop.",
+        tag: "Langkah 3 dari 6"
+      },
+      {
+        step: 3,
+        title: "Tahap 4: Voice Recording / Voiceover",
+        desc: "Perekaman audio berkualitas tinggi, tempo energik namun artikulatif (130–160 WPM), tanpa jeda kosong (*zero dead air*).",
+        tag: "Langkah 4 dari 6"
+      },
+      {
+        step: 4,
+        title: "Tahap 5: Video Editing (60–90 Menit per Short)",
+        desc: "Sinkronisasi teks dinamis 2–4 kata, B-roll rekaman layar 1080p dengan zoom penyorot, SFX minimalis, dan BGM bebas klaim hak cipta.",
+        tag: "Langkah 5 dari 6"
+      },
+      {
+        step: 5,
+        title: "Tahap 6: Publish & First Hour Engagement",
+        desc: "Memasang judul formula tanya 5–10 kata, memilih thumbnail frame terbaik di YouTube Studio, dan merespons komentar pada 60 menit pertama.",
+        tag: "Langkah 6 dari 6"
+      }
+    ];
+
+    const SAMPLE_SCRIPT = `Apa kamu tahu WhatsApp baru saja menambahkan fitur kode rahasia untuk kunci chat pribadi?
+
+Mulai minggu ini, pesan rahasiamu tidak akan lagi muncul di daftar arsip biasa kalau belum memasukkan sandi khusus.
+
+Caranya mudah: buka folder Chat Terkunci, masuk ke setelan, lalu aktifkan Sembunyikan Chat dan buat kata sandi unikmu. Sekarang, daftar chat itu benar-benar hilang dari layar utama sampai kamu mengetikkan kodenya di kolom pencarian.
+
+Cek sekarang di ponselmu dan aktifkan sebelum dipinjam orang lain.`;
+
+    // --- 2. DARK/LIGHT THEME TOGGLE ---
+    const bodyElem = document.body;
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('zeinity_theme') || 'dark';
+      setTheme(savedTheme);
+    }
+
+    function setTheme(theme) {
+      bodyElem.setAttribute('data-theme', theme);
+      if (theme === 'light') {
+        themeIcon.textContent = '☀️';
+        themeToggleBtn.setAttribute('title', 'Beralih ke Dark Mode');
+      } else {
+        themeIcon.textContent = '🌙';
+        themeToggleBtn.setAttribute('title', 'Beralih ke Light Mode');
+      }
+      localStorage.setItem('zeinity_theme', theme);
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = bodyElem.getAttribute('data-theme');
+      setTheme(current === 'light' ? 'dark' : 'light');
+    });
+
+    // --- 3. TOAST NOTIFICATION UTILITY ---
+    const toastPopup = document.getElementById('toastPopup');
+    const toastMsg = document.getElementById('toastMsg');
+    let toastTimeout;
+
+    function showToast(text) {
+      toastMsg.textContent = text;
+      toastPopup.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastPopup.classList.remove('show');
+      }, 3000);
+    }
+
+    // Copy About YouTube
+    function copyAboutText() {
+      const text = document.getElementById('aboutTextSource').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Deskripsi About YouTube berhasil disalin ke clipboard!');
+      }).catch(() => {
+        showToast('Gagal menyalin otomatis. Silakan salin manual.');
+      });
+    }
+    document.getElementById('copyAboutBtn').addEventListener('click', copyAboutText);
+    document.getElementById('copyAboutInnerBtn').addEventListener('click', copyAboutText);
+
+    // --- 4. PILLARS INTERACTIVE LOGIC ---
+    const pillarButtons = document.querySelectorAll('.pillar-tab-btn');
+    const pillarBadgeText = document.getElementById('pillarBadgeText');
+    const pillarTitleText = document.getElementById('pillarTitleText');
+    const pillarTagList = document.getElementById('pillarTagList');
+    const pillarScopeText = document.getElementById('pillarScopeText');
+    const pillarSampleList = document.getElementById('pillarSampleList');
+
+    function renderPillar(index) {
+      const data = PILLARS_DATA[index];
+      if (!data) return;
+
+      pillarBadgeText.textContent = data.badge;
+      pillarTitleText.textContent = data.name;
+      pillarScopeText.textContent = data.scope;
+
+      // Tags
+      pillarTagList.innerHTML = '';
+      data.tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'badge';
+        span.textContent = t;
+        pillarTagList.appendChild(span);
+      });
+
+      // Samples
+      pillarSampleList.innerHTML = '';
+      data.samples.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'sample-pill-item';
+        div.innerHTML = `<span style="color: var(--accent-secondary); font-weight: bold;">✦</span> <span>${s}</span>`;
+        pillarSampleList.appendChild(div);
+      });
+
+      pillarButtons.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.pillar) === index);
+      });
+    }
+
+    pillarButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        renderPillar(parseInt(btn.dataset.pillar));
+      });
+    });
+    renderPillar(0);
+
+    // --- 5. FORMATS & TIMELINE PLAYER LOGIC ---
+    const formatButtons = document.querySelectorAll('.format-btn-item');
+    const fmtDurationBadge = document.getElementById('fmtDurationBadge');
+    const fmtHeading = document.getElementById('fmtHeading');
+    const fmtPurpose = document.getElementById('fmtPurpose');
+    const fmtMaxDurationLabel = document.getElementById('fmtMaxDurationLabel');
+    const timelineBarWrapper = document.getElementById('timelineBarWrapper');
+    const fmtStepsList = document.getElementById('fmtStepsList');
+    const playSimBtn = document.getElementById('playSimBtn');
+    const simTimeDisplay = document.getElementById('simTimeDisplay');
+
+    let currentFormatIdx = 0;
+    let simInterval = null;
+    let currentSimSec = 0;
+
+    function renderFormat(index) {
+      clearInterval(simInterval);
+      simInterval = null;
+      playSimBtn.textContent = '▶ Simulasi Playback';
+      currentSimSec = 0;
+
+      currentFormatIdx = index;
+      const data = FORMATS_DATA[index];
+      if (!data) return;
+
+      fmtDurationBadge.textContent = data.duration;
+      fmtHeading.textContent = data.title;
+      fmtPurpose.textContent = data.purpose;
+      fmtMaxDurationLabel.textContent = `Total Durasi: ${data.maxSec}s`;
+      simTimeDisplay.textContent = `Detik: 0s / ${data.maxSec}s`;
+
+      // Render timeline bar slices
+      timelineBarWrapper.innerHTML = '';
+      data.slices.forEach(slice => {
+        const div = document.createElement('div');
+        div.className = `timeline-slice ${slice.class}`;
+        div.style.width = `${slice.percent}%`;
+        div.textContent = slice.label;
+        div.title = `${slice.label}: ${slice.desc}`;
+        timelineBarWrapper.appendChild(div);
+      });
+
+      // Render step breakdown
+      fmtStepsList.innerHTML = '';
+      data.steps.forEach(st => {
+        const card = document.createElement('div');
+        card.className = 'stage-step-card';
+        card.innerHTML = `
+          <div class="step-time">${st.time}</div>
+          <div class="step-name">${st.name}</div>
+          <div class="step-desc">${st.desc}</div>
+        `;
+        fmtStepsList.appendChild(card);
+      });
+
+      formatButtons.forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.fmt) === index);
+      });
+    }
+
+    formatButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        renderFormat(parseInt(btn.dataset.fmt));
+      });
+    });
+    renderFormat(0);
+
+    // Playback simulator
+    playSimBtn.addEventListener('click', () => {
+      const data = FORMATS_DATA[currentFormatIdx];
+      if (simInterval) {
+        clearInterval(simInterval);
+        simInterval = null;
+        playSimBtn.textContent = '▶ Lanjutkan';
+      } else {
+        playSimBtn.textContent = '⏸ Pause';
+        simInterval = setInterval(() => {
+          currentSimSec += 1;
+          if (currentSimSec > data.maxSec) {
+            currentSimSec = 0;
+            clearInterval(simInterval);
+            simInterval = null;
+            playSimBtn.textContent = '🔄 Putar Ulang';
+          }
+          simTimeDisplay.textContent = `Detik: ${currentSimSec}s / ${data.maxSec}s`;
+        }, 300);
+      }
+    });
+
+    // --- 6. SCRIPT ECONOMY & WORD/PACE CALCULATOR ---
+    const scriptInput = document.getElementById('scriptInput');
+    const wordCountDisplay = document.getElementById('wordCountDisplay');
+    const wordBarFill = document.getElementById('wordBarFill');
+    const wordStatusMsg = document.getElementById('wordStatusMsg');
+    const estTimeDisplay = document.getElementById('estTimeDisplay');
+    const densityVerdict = document.getElementById('densityVerdict');
+    const loadSampleScriptBtn = document.getElementById('loadSampleScriptBtn');
+
+    function analyzeScript() {
+      const text = scriptInput.value.trim();
+      const words = text ? text.split(/\s+/).filter(w => w.length > 0) : [];
+      const count = words.length;
+
+      wordCountDisplay.textContent = count;
+
+      // 145 words per minute average speaking rate -> ~2.41 words per second
+      const estimatedSec = Math.round((count / 145) * 60);
+      estTimeDisplay.textContent = `${estimatedSec}s`;
+
+      // Percentage bar based on ideal 140 max
+      const percent = Math.min(100, Math.round((count / 140) * 100));
+      wordBarFill.style.width = `${percent}%`;
+
+      if (count === 0) {
+        wordBarFill.style.background = 'var(--accent-primary)';
+        wordStatusMsg.textContent = 'Ideal: 90–140 kata (maks. 60 detik)';
+        wordStatusMsg.style.color = 'var(--text-muted)';
+        densityVerdict.textContent = '-';
+        densityVerdict.style.color = 'var(--accent-secondary)';
+      } else if (count < 90) {
+        wordBarFill.style.background = 'var(--accent-warning)';
+        wordStatusMsg.textContent = `⚠️ Kurang ${90 - count} kata untuk mencapai batas minimal 90 kata`;
+        wordStatusMsg.style.color = 'var(--accent-warning)';
+        densityVerdict.textContent = 'Terlalu Pendek';
+        densityVerdict.style.color = 'var(--accent-warning)';
+      } else if (count <= 140) {
+        wordBarFill.style.background = 'var(--accent-success)';
+        wordStatusMsg.textContent = `✅ Sempurna! Masuk dalam rentang optimal 90–140 kata (${count} kata)`;
+        wordStatusMsg.style.color = 'var(--accent-success)';
+        densityVerdict.textContent = 'Optimal (Sweet Spot)';
+        densityVerdict.style.color = 'var(--accent-success)';
+      } else {
+        wordBarFill.style.background = 'var(--accent-danger)';
+        wordStatusMsg.textContent = `🚨 Terlalu padat! Melebihi ${count - 140} kata (Risiko durasi > 60s)`;
+        wordStatusMsg.style.color = 'var(--accent-danger)';
+        densityVerdict.textContent = 'Terlalu Padat';
+        densityVerdict.style.color = 'var(--accent-danger)';
+      }
+    }
+
+    scriptInput.addEventListener('input', analyzeScript);
+    loadSampleScriptBtn.addEventListener('click', () => {
+      scriptInput.value = SAMPLE_SCRIPT;
+      analyzeScript();
+      showToast('Contoh naskah berhasil dimuat!');
+    });
+
+    // --- 7. FORMULA JUDUL & LIVE VALIDATOR ---
+    const customTitleInput = document.getElementById('customTitleInput');
+    const overlayPreviewText = document.getElementById('overlayPreviewText');
+    const titleWordCount = document.getElementById('titleWordCount');
+    const checkQuestionWord = document.getElementById('checkQuestionWord');
+    const checkWordLength = document.getElementById('checkWordLength');
+    const iconCheckWord = document.getElementById('iconCheckWord');
+    const iconCheckLen = document.getElementById('iconCheckLen');
+    const formulaPillBtns = document.querySelectorAll('.formula-pill-btn');
+
+    function validateTitle() {
+      const raw = customTitleInput.value.trim();
+      overlayPreviewText.textContent = raw || 'Tulis Judul Shorts...';
+
+      const words = raw ? raw.split(/\s+/).filter(w => w.length > 0) : [];
+      const count = words.length;
+      titleWordCount.textContent = count;
+
+      // Check first question word
+      const firstWord = words.length > 0 ? words[0].toLowerCase().replace(/[^a-z]/g, '') : '';
+      const validFirstWords = ['apa', 'kenapa', 'bagaimana'];
+      const isQuestionValid = validFirstWords.includes(firstWord);
+
+      if (isQuestionValid) {
+        iconCheckWord.textContent = '✅';
+        checkQuestionWord.style.color = 'var(--text-main)';
+      } else {
+        iconCheckWord.textContent = '❌';
+        checkQuestionWord.style.color = 'var(--accent-danger)';
+      }
+
+      // Check word length 5-10
+      if (count >= 5 && count <= 10) {
+        iconCheckLen.textContent = '✅';
+        checkWordLength.style.color = 'var(--accent-success)';
+      } else {
+        iconCheckLen.textContent = '⚠️';
+        checkWordLength.style.color = 'var(--accent-warning)';
+      }
+    }
+
+    customTitleInput.addEventListener('input', validateTitle);
+
+    formulaPillBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        formulaPillBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const type = btn.dataset.type;
+        if (type === 'apa') {
+          customTitleInput.value = 'Apa Saja Fitur Baru WhatsApp Bulan Ini?';
+        } else if (type === 'kenapa') {
+          customTitleInput.value = 'Kenapa Aplikasi Ini Diam-Diam Pakai Kuotamu?';
+        } else if (type === 'bagaimana') {
+          customTitleInput.value = 'Bagaimana Cara Mematikan Fitur Pelacak di Ponsel?';
+        }
+        validateTitle();
+      });
+    });
+    validateTitle();
+
+    // --- 8. 9:16 SAFE ZONE SIMULATOR CONTROLS ---
+    const toggleShortsUIBtn = document.getElementById('toggleShortsUIBtn');
+    const toggleSafeZoneColorsBtn = document.getElementById('toggleSafeZoneColorsBtn');
+    const mockShortsUI = document.getElementById('mockShortsUI');
+    const zoneTopElem = document.getElementById('zoneTopElem');
+    const zoneCenterElem = document.getElementById('zoneCenterElem');
+    const zoneBottomElem = document.getElementById('zoneBottomElem');
+
+    let isUIVisible = true;
+    let isColorsVisible = true;
+
+    toggleShortsUIBtn.addEventListener('click', () => {
+      isUIVisible = !isUIVisible;
+      mockShortsUI.style.opacity = isUIVisible ? '1' : '0.1';
+      toggleShortsUIBtn.textContent = isUIVisible ? 'Sembunyikan UI YouTube' : 'Tampilkan UI YouTube';
+    });
+
+    toggleSafeZoneColorsBtn.addEventListener('click', () => {
+      isColorsVisible = !isColorsVisible;
+      zoneTopElem.style.opacity = isColorsVisible ? '1' : '0.2';
+      zoneCenterElem.style.opacity = isColorsVisible ? '1' : '0.2';
+      zoneBottomElem.style.opacity = isColorsVisible ? '1' : '0.2';
+      toggleSafeZoneColorsBtn.textContent = isColorsVisible ? 'Pudarkan Warna Zona' : 'Tajamkan Warna Zona';
+    });
+
+    // --- 9. PIPELINE WORKFLOW STEP TRACKER ---
+    const pipelineStepItems = document.querySelectorAll('.pipeline-step-item');
+    const pipeDetailTitle = document.getElementById('pipeDetailTitle');
+    const pipeDetailDesc = document.getElementById('pipeDetailDesc');
+    const pipeDetailTag = document.getElementById('pipeDetailTag');
+
+    function renderPipelineStep(index) {
+      const data = PIPELINE_DATA[index];
+      if (!data) return;
+
+      pipeDetailTitle.textContent = data.title;
+      pipeDetailDesc.textContent = data.desc;
+      pipeDetailTag.textContent = data.tag;
+
+      pipelineStepItems.forEach(item => {
+        item.classList.toggle('active', parseInt(item.dataset.step) === index);
+      });
+    }
+
+    pipelineStepItems.forEach(item => {
+      item.addEventListener('click', () => {
+        renderPipelineStep(parseInt(item.dataset.step));
+      });
+    });
+
+    // --- 10. METRICS EVALUATION & ALGORITHM SIMULATOR ---
+    const viewedSlider = document.getElementById('viewedSlider');
+    const apvSlider = document.getElementById('apvSlider');
+    const viewedValDisplay = document.getElementById('viewedValDisplay');
+    const apvValDisplay = document.getElementById('apvValDisplay');
+    const verdictCircle = document.getElementById('verdictCircle');
+    const verdictScoreText = document.getElementById('verdictScoreText');
+    const verdictTagText = document.getElementById('verdictTagText');
+    const verdictHeadline = document.getElementById('verdictHeadline');
+    const verdictExplanation = document.getElementById('verdictExplanation');
+
+    function calculateAlgorithmHealth() {
+      const viewed = parseInt(viewedSlider.value);
+      const apv = parseInt(apvSlider.value);
+
+      viewedValDisplay.textContent = `${viewed}%`;
+      apvValDisplay.textContent = `${apv}%`;
+
+      // Scoring logic based on document rules
+      // Viewed target: >= 70%
+      // APV target: 90% - 110%
+      if (viewed >= 75 && apv >= 100) {
+        verdictCircle.style.borderColor = 'var(--accent-success)';
+        verdictCircle.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.4)';
+        verdictScoreText.textContent = 'A+';
+        verdictScoreText.style.color = 'var(--accent-success)';
+        verdictTagText.textContent = 'Viral Ready';
+        verdictHeadline.textContent = 'Peluang Distribusi Viral Sangat Tinggi! 🔥';
+        verdictHeadline.style.color = 'var(--accent-success)';
+        verdictExplanation.textContent = 'Hook 0–3 detik sangat efektif mengunci penonton (Viewed ≥ 75%) dan naskah padat memicu penonton menonton ulang (APV ≥ 100%). Algoritma YouTube akan mendorong video ke feed rekomendasi masif.';
+      } else if (viewed >= 70 && apv >= 90) {
+        verdictCircle.style.borderColor = 'var(--accent-secondary)';
+        verdictCircle.style.boxShadow = '0 0 30px rgba(6, 182, 212, 0.3)';
+        verdictScoreText.textContent = 'A';
+        verdictScoreText.style.color = 'var(--accent-secondary)';
+        verdictTagText.textContent = 'Sehat Optimal';
+        verdictHeadline.textContent = 'Performa Sangat Sehat & Stabil';
+        verdictHeadline.style.color = 'var(--accent-secondary)';
+        verdictExplanation.textContent = 'Target standar Zeinity tercapai dengan baik (Viewed ≥ 70%, APV 90–100%). Video berkinerja stabil dan layak dipertahankan ritmenya.';
+      } else if (viewed < 60) {
+        verdictCircle.style.borderColor = 'var(--accent-danger)';
+        verdictCircle.style.boxShadow = '0 0 30px rgba(239, 68, 68, 0.3)';
+        verdictScoreText.textContent = 'C';
+        verdictScoreText.style.color = 'var(--accent-danger)';
+        verdictTagText.textContent = 'Kritis Hook';
+        verdictHeadline.textContent = 'Detik 0–3 Gagal Menangkap Atensi 🚨';
+        verdictHeadline.style.color = 'var(--accent-danger)';
+        verdictExplanation.textContent = 'Rasio Viewed di bawah 60% menandakan hook pembuka terlalu lambat, membosankan, atau teks overlay tidak memicu rasa ingin tahu. Ganti pembuka dengan Zero Dead Air!';
+      } else if (apv < 80) {
+        verdictCircle.style.borderColor = 'var(--accent-warning)';
+        verdictCircle.style.boxShadow = '0 0 30px rgba(245, 158, 11, 0.3)';
+        verdictScoreText.textContent = 'B-';
+        verdictScoreText.style.color = 'var(--accent-warning)';
+        verdictTagText.textContent = 'Drop Retensi';
+        verdictHeadline.textContent = 'Penonton Drop di Tengah Video ⚠️';
+        verdictHeadline.style.color = 'var(--accent-warning)';
+        verdictExplanation.textContent = 'Penonton tertarik di awal namun keluar sebelum video selesai. Evaluasi transisi visual (wajib ada zoom/cut tiap 2–3 detik) dan perpendek durasi naskah.';
+      } else {
+        verdictCircle.style.borderColor = 'var(--accent-primary)';
+        verdictCircle.style.boxShadow = '0 0 30px var(--accent-primary-glow)';
+        verdictScoreText.textContent = 'B+';
+        verdictScoreText.style.color = 'var(--accent-primary)';
+        verdictTagText.textContent = 'Cukup Baik';
+        verdictHeadline.textContent = 'Performa Cukup Bagus, Butuh Polishing';
+        verdictHeadline.style.color = 'var(--accent-primary)';
+        verdictExplanation.textContent = 'Performa mendekati target ideal. Perkuat kalimat penutup untuk seamless looping agar APV melonjak di atas 100%.';
+      }
+    }
+
+    viewedSlider.addEventListener('input', calculateAlgorithmHealth);
+    apvSlider.addEventListener('input', calculateAlgorithmHealth);
+    calculateAlgorithmHealth();
+
+    // --- 11. PRE-PUBLISH CHECKLIST LOGIC ---
+    const checkItemBoxes = document.querySelectorAll('.check-item-box');
+    const checklistStatusBadge = document.getElementById('checklistStatusBadge');
+
+    function updateChecklistStatus() {
+      const checkedCount = document.querySelectorAll('.check-item-box.checked').length;
+      checklistStatusBadge.textContent = `${checkedCount} / 5 Lolos Cek`;
+
+      if (checkedCount === 5) {
+        checklistStatusBadge.className = 'badge badge-success';
+        checklistStatusBadge.textContent = '🎉 5/5 Siap Publikasi!';
+      } else if (checkedCount > 0) {
+        checklistStatusBadge.className = 'badge badge-warning';
+      } else {
+        checklistStatusBadge.className = 'badge badge-primary';
+      }
+    }
+
+    checkItemBoxes.forEach(box => {
+      box.addEventListener('click', () => {
+        box.classList.toggle('checked');
+        updateChecklistStatus();
+      });
+    });
+
+    // --- 12. HIGHLIGHT ACTIVE NAV ON SCROLL ---
+    const navPillLinks = document.querySelectorAll('.pill-link');
+    window.addEventListener('scroll', () => {
+      let currentSection = '';
+      const sections = document.querySelectorAll('section[id]');
+      sections.forEach(sec => {
+        const top = sec.offsetTop - 120;
+        if (window.scrollY >= top) {
+          currentSection = sec.getAttribute('id');
+        }
+      });
+      navPillLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${currentSection}`);
+      });
+    }, { passive: true });
+
+  </script>
+</body>
+</html>
