@@ -32,7 +32,7 @@ export function getDefaultAiConfig(): AiGatewayConfig {
         return {
           baseUrl: parsed.nineRouterBaseUrl,
           apiKey: parsed.nineRouterApiKey || '',
-          comboName: parsed.nineRouterCombo || 'zeinity-combo'
+          comboName: parsed.nineRouterCombo || 'Creator-Combo'
         };
       }
     }
@@ -44,7 +44,7 @@ export function getDefaultAiConfig(): AiGatewayConfig {
   return {
     baseUrl: (import.meta as any).env?.VITE_NINEROUTER_BASE_URL || 'http://localhost:20128/v1',
     apiKey: (import.meta as any).env?.VITE_NINEROUTER_API_KEY || '',
-    comboName: (import.meta as any).env?.VITE_NINEROUTER_COMBO || 'zeinity-combo'
+    comboName: (import.meta as any).env?.VITE_NINEROUTER_COMBO || 'Creator-Combo'
   };
 }
 
@@ -119,43 +119,87 @@ export async function testNineRouterHealth(
   }
 }
 
+export interface NineRouterCombo {
+  id: string;
+  name: string;
+  models: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 /**
- * Ambil daftar model/combo yang tersedia di 9Router via GET /v1/models.
- * Returns array of model id strings, e.g. ["zeinity-combo", "gpt-4o", ...]
+ * Mengambil daftar COMBOS resmi yang dikonfigurasi di 9Router.
+ * 9Router mengelola Combos di /api/combos dan mengeksposnya di /v1/models dengan owned_by: "combo".
+ * Fungsi ini HANYA mengembalikan Combos (TIDAK mengembalikan puluhan raw model individual).
  */
-export async function fetchAvailableModels(
+export async function fetchNineRouterCombos(
   config: AiGatewayConfig
-): Promise<string[]> {
-  const url = `${config.baseUrl.replace(/\/+$/, '')}/models`;
+): Promise<NineRouterCombo[]> {
+  const baseHost = config.baseUrl.replace(/\/v1\/?$/, '').replace(/\/+$/, '');
   const headers: Record<string, string> = {};
   if (config.apiKey) {
     headers['Authorization'] = `Bearer ${config.apiKey}`;
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+  // Metode 1: Coba endpoint resmi 9Router /api/combos
   try {
-    const resp = await fetch(url, { method: 'GET', headers, signal: controller.signal });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const resp = await fetch(`${baseHost}/api/combos`, { headers, signal: controller.signal });
     clearTimeout(timeoutId);
 
-    if (!resp.ok) {
-      throw new Error(`HTTP ${resp.status}`);
+    if (resp.ok) {
+      const data = await resp.json();
+      if (Array.isArray(data?.combos) && data.combos.length > 0) {
+        return data.combos.map((c: any) => ({
+          id: String(c.id || c.name),
+          name: String(c.name || c.id),
+          models: Array.isArray(c.models) ? c.models.map(String) : [],
+          createdAt: c.createdAt,
+          updatedAt: c.updatedAt
+        }));
+      }
     }
-    const data = await resp.json();
-    // OpenAI-compatible: { data: [{ id: "model-name", ... }] }
-    if (Array.isArray(data?.data)) {
-      return data.data.map((m: any) => String(m.id)).filter(Boolean);
-    }
-    // Some 9Router versions return array directly
-    if (Array.isArray(data)) {
-      return data.map((m: any) => String(m.id || m)).filter(Boolean);
-    }
-    return [];
   } catch {
-    clearTimeout(timeoutId);
-    return [];
+    // Lanjut ke metode 2 jika /api/combos gagal
   }
+
+  // Metode 2: Fallback ke /v1/models dengan filter ketat (hanya owned_by === 'combo')
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const modelsUrl = `${config.baseUrl.replace(/\/+$/, '')}/models`;
+    const resp = await fetch(modelsUrl, { headers, signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (resp.ok) {
+      const data = await resp.json();
+      const list: any[] = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+      // HANYA ambil item dengan owned_by === 'combo'!
+      const combosOnly = list.filter((m: any) => m.owned_by === 'combo');
+      if (combosOnly.length > 0) {
+        return combosOnly.map((c: any) => ({
+          id: String(c.id),
+          name: String(c.id),
+          models: []
+        }));
+      }
+    }
+  } catch {
+    // Abaikan jika offline
+  }
+
+  return [];
+}
+
+/**
+ * Backward-compatible helper: mengembalikan array nama-nama Combo
+ */
+export async function fetchAvailableModels(
+  config: AiGatewayConfig
+): Promise<string[]> {
+  const combos = await fetchNineRouterCombos(config);
+  return combos.map(c => c.name);
 }
 
 // -------------------------------------------------------
@@ -166,7 +210,7 @@ export async function callNineRouter(
   config: AiGatewayConfig,
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
   temperature = 0.7,
-  maxTokens = 1024
+  maxTokens = 2048
 ): Promise<string> {
   const url = `${config.baseUrl.replace(/\/+$/, '')}/chat/completions`;
 
@@ -179,9 +223,10 @@ export async function callNineRouter(
   }
 
   const payload = {
-    model: config.comboName || 'zeinity-combo',
+    model: config.comboName || 'Creator-Combo',
     messages,
     temperature,
+    stream: false,
     max_tokens: maxTokens
   };
 
@@ -213,19 +258,35 @@ export async function callNineRouter(
       throw new Error(`9Router: API Key tidak valid atau tidak dikenali (${response.status}). Periksa API Key di Pengaturan.`);
     }
     if (response.status === 404) {
-      throw new Error(`9Router: Combo/Model "${config.comboName}" tidak ditemukan (404). Periksa nama Combo di dashboard 9Router.`);
+      throw new Error(`9Router: Combo "${config.comboName}" tidak ditemukan di gateway (404). Silakan pilih Combo yang aktif di Pengaturan.`);
     }
     if (response.status === 429) {
       throw new Error('9Router: Rate limit tercapai (429). Semua provider di Combo sedang penuh — coba lagi dalam beberapa saat.');
     }
     if (response.status >= 500) {
-      throw new Error(`9Router: Gateway error (${response.status}). Semua provider mungkin tidak merespons — periksa konfigurasi provider di dashboard.`);
+      throw new Error(`9Router: Gateway error (${response.status}). Semua provider mungkin tidak merespons — periksa dashboard 9Router.`);
     }
     throw new Error(`9Router error (${response.status}): ${errorText || response.statusText}`);
   }
 
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content;
+  const rawText = await response.text();
+  let content = '';
+
+  try {
+    const data = JSON.parse(rawText);
+    content = data.choices?.[0]?.message?.content || '';
+  } catch {
+    // Parsing robust jika response berupa SSE event stream chunks (data: {...})
+    const lines = rawText.split('\n').filter(l => l.startsWith('data: ') && !l.includes('[DONE]'));
+    for (const line of lines) {
+      try {
+        const chunk = JSON.parse(line.replace('data: ', '').trim());
+        const delta = chunk.choices?.[0]?.delta?.content || chunk.choices?.[0]?.message?.content || '';
+        content += delta;
+      } catch {}
+    }
+  }
+
   if (!content) {
     throw new Error('Respons dari 9Router kosong.');
   }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Database, 
@@ -15,11 +15,13 @@ import {
   ExternalLink,
   RefreshCw,
   Activity,
-  List
+  Layers,
+  Sparkles,
+  Check
 } from 'lucide-react';
 import { AppSettings, ContentItem } from '../types';
 import { testSupabaseConnection } from '../services/supabaseClient';
-import { testNineRouterHealth, fetchAvailableModels } from '../services/aiGateway';
+import { testNineRouterHealth, fetchNineRouterCombos, NineRouterCombo } from '../services/aiGateway';
 import { exportDatabaseToJson } from '../services/storage';
 import { STARTER_SHORTS } from '../services/starterData';
 
@@ -45,8 +47,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
   const [supabaseTestStatus, setSupabaseTestStatus] = useState<{ loading: boolean; message?: string; success?: boolean } | null>(null);
   const [nineRouterTestStatus, setNineRouterTestStatus] = useState<{ loading: boolean; message?: string; success?: boolean } | null>(null);
-  const [availableModels, setAvailableModels] = useState<string[]>([]);
-  const [isFetchingModels, setIsFetchingModels] = useState(false);
+  const [detectedCombos, setDetectedCombos] = useState<NineRouterCombo[]>([]);
+  const [isDetectingCombos, setIsDetectingCombos] = useState(false);
+  const [useCustomComboInput, setUseCustomComboInput] = useState(false);
   const [activeTab, setActiveTab] = useState<'cloud' | 'ai' | 'backup' | 'guide'>('cloud');
 
   if (!isOpen) return null;
@@ -66,6 +69,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setSupabaseTestStatus({ loading: false, success: result.success, message: result.message });
   };
 
+  const handleDetectCombos = async () => {
+    setIsDetectingCombos(true);
+    const config = {
+      baseUrl: localSettings.nineRouterBaseUrl,
+      apiKey: localSettings.nineRouterApiKey,
+      comboName: localSettings.nineRouterCombo
+    };
+    const combos = await fetchNineRouterCombos(config);
+    setDetectedCombos(combos);
+    setIsDetectingCombos(false);
+
+    // Otomatis pilih combo yang ada jika nama saat ini belum valid
+    if (combos.length > 0) {
+      const match = combos.find(c => c.name === localSettings.nineRouterCombo);
+      if (!match) {
+        setLocalSettings(prev => ({ ...prev, nineRouterCombo: combos[0].name }));
+      }
+    }
+  };
+
   const handleTestNineRouter = async () => {
     setNineRouterTestStatus({ loading: true });
     const config = {
@@ -81,19 +104,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         ? `${result.message}${result.version ? ` (v${result.version})` : ''}`
         : result.message
     });
+
+    if (result.online) {
+      handleDetectCombos();
+    }
   };
 
-  const handleFetchModels = async () => {
-    setIsFetchingModels(true);
-    const config = {
-      baseUrl: localSettings.nineRouterBaseUrl,
-      apiKey: localSettings.nineRouterApiKey,
-      comboName: localSettings.nineRouterCombo
-    };
-    const models = await fetchAvailableModels(config);
-    setAvailableModels(models);
-    setIsFetchingModels(false);
-  };
+  // Deteksi otomatis Combos saat tab AI dibuka
+  useEffect(() => {
+    if (isOpen && activeTab === 'ai') {
+      handleDetectCombos();
+    }
+  }, [isOpen, activeTab, localSettings.nineRouterBaseUrl, localSettings.nineRouterApiKey]);
 
   const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -299,57 +321,125 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <p className="text-[10px] text-slate-500 mt-1">Salin dari tab "API Keys" di dashboard 9Router. Kosongkan untuk gateway tanpa autentikasi.</p>
               </div>
 
-              {/* Combo Name */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-semibold text-slate-300">
-                    Nama Combo (Model Routing)
-                  </label>
+              {/* Combo Selection Section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-purple-400" />
+                      Pilih Combo 9Router (Routing AI)
+                    </label>
+                    <p className="text-[10px] text-slate-400">
+                      Grup model fallback yang terdaftar di 9Router lokal Anda.
+                    </p>
+                  </div>
                   <button
                     type="button"
-                    onClick={handleFetchModels}
-                    disabled={isFetchingModels}
-                    className="flex items-center gap-1 text-[10px] text-purple-300 hover:text-white border border-purple-500/30 px-2 py-0.5 rounded-lg transition-colors"
+                    onClick={handleDetectCombos}
+                    disabled={isDetectingCombos}
+                    className="flex items-center gap-1 text-[10px] text-purple-300 hover:text-white border border-purple-500/30 px-2 py-0.5 rounded-lg transition-colors bg-purple-500/10 hover:bg-purple-500/20"
+                    title="Pindai ulang daftar Combos dari 9Router"
                   >
-                    {isFetchingModels
-                      ? <RefreshCw className="w-3 h-3 animate-spin" />
-                      : <List className="w-3 h-3" />
-                    }
-                    {isFetchingModels ? 'Mengambil...' : 'Cari Combo'}
+                    <RefreshCw className={`w-3 h-3 ${isDetectingCombos ? 'animate-spin' : ''}`} />
+                    <span>{isDetectingCombos ? 'Memindai...' : 'Pindai Ulang'}</span>
                   </button>
                 </div>
-                <input
-                  type="text"
-                  value={localSettings.nineRouterCombo}
-                  onChange={e => setLocalSettings({ ...localSettings, nineRouterCombo: e.target.value })}
-                  placeholder="zeinity-combo"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500"
-                />
-                {availableModels.length > 0 && (
-                  <div className="mt-2 p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
-                    <p className="text-[10px] text-slate-400 mb-1.5 font-semibold">Combo/Model tersedia di gateway:</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {availableModels.map(m => (
-                        <button
-                          key={m}
-                          type="button"
-                          onClick={() => setLocalSettings({ ...localSettings, nineRouterCombo: m })}
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md border transition-all ${
-                            localSettings.nineRouterCombo === m
-                              ? 'bg-purple-600 text-white border-purple-500'
-                              : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-purple-500/50 hover:text-purple-300'
-                          }`}
-                        >
-                          {m}
-                        </button>
-                      ))}
+
+                {/* If Combos Detected */}
+                {detectedCombos.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {detectedCombos.map(combo => {
+                        const isSelected = localSettings.nineRouterCombo === combo.name;
+                        return (
+                          <div
+                            key={combo.id}
+                            onClick={() => {
+                              setLocalSettings({ ...localSettings, nineRouterCombo: combo.name });
+                              setUseCustomComboInput(false);
+                            }}
+                            className={`cursor-pointer p-3 rounded-xl border transition-all text-left relative ${
+                              isSelected
+                                ? 'bg-purple-950/40 border-purple-500 shadow-md shadow-purple-500/20 ring-1 ring-purple-500'
+                                : 'bg-slate-900/70 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <span className="font-bold text-xs text-white flex items-center gap-1.5 truncate">
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-purple-400 ring-2 ring-purple-400/30' : 'bg-slate-600'}`} />
+                                <span className="truncate">{combo.name}</span>
+                              </span>
+                              {isSelected && (
+                                <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded font-semibold shrink-0">
+                                  Aktif
+                                </span>
+                              )}
+                            </div>
+
+                            {combo.models && combo.models.length > 0 ? (
+                              <div className="mt-1">
+                                <span className="text-[10px] text-purple-300/80 font-mono block mb-1">
+                                  {combo.models.length} Model Fallback Chain:
+                                </span>
+                                <div className="flex flex-wrap gap-1">
+                                  {combo.models.slice(0, 3).map((m, idx) => (
+                                    <span key={idx} className="text-[9px] font-mono bg-slate-950 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800 truncate max-w-[130px]">
+                                      {m.replace(/^.*\//, '')}
+                                    </span>
+                                  ))}
+                                  {combo.models.length > 3 && (
+                                    <span className="text-[9px] font-mono text-slate-500 px-1 py-0.5">
+                                      +{combo.models.length - 3} lagi
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-slate-500 italic block mt-1">
+                                Siap digunakan
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+                      <span>
+                        Combo aktif: <strong className="text-purple-300 font-mono">{localSettings.nineRouterCombo}</strong>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setUseCustomComboInput(!useCustomComboInput)}
+                        className="text-purple-400 hover:text-purple-300 underline"
+                      >
+                        {useCustomComboInput ? 'Tutup input manual' : 'Ketik nama combo manual'}
+                      </button>
+                    </div>
+
+                    {useCustomComboInput && (
+                      <input
+                        type="text"
+                        value={localSettings.nineRouterCombo}
+                        onChange={e => setLocalSettings({ ...localSettings, nineRouterCombo: e.target.value })}
+                        placeholder="Creator-Combo"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-white font-mono focus:outline-none focus:border-purple-500 text-xs mt-1"
+                      />
+                    )}
                   </div>
-                )}
-                {availableModels.length === 0 && !isFetchingModels && (
-                  <p className="text-[10px] text-slate-500 mt-1">
-                    Klik "Cari Combo" untuk mengambil daftar combo dari gateway — atau ketik nama combo langsung.
-                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={localSettings.nineRouterCombo}
+                      onChange={e => setLocalSettings({ ...localSettings, nineRouterCombo: e.target.value })}
+                      placeholder="Creator-Combo"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500 text-xs"
+                    />
+                    <p className="text-[10px] text-slate-500">
+                      9Router belum terdeteksi aktif di {localSettings.nineRouterBaseUrl}. Anda bisa memasukkan nama combo secara manual (misal: <code>Creator-Combo</code> atau <code>Gemini-Cluster</code>).
+                    </p>
+                  </div>
                 )}
               </div>
 
