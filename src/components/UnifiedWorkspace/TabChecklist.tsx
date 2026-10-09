@@ -10,9 +10,11 @@ import {
   FileText, 
   ExternalLink,
   ShieldAlert,
-  Sparkles
+  Sparkles,
+  Mic
 } from 'lucide-react';
 import { ContentItem } from '../../types';
+import { TeleprompterModal } from './TeleprompterModal';
 
 interface TabChecklistProps {
   content: ContentItem;
@@ -24,6 +26,7 @@ export const TabChecklist: React.FC<TabChecklistProps> = ({ content, onChange })
   const [newAssetName, setNewAssetName] = useState('');
   const [newAssetUrl, setNewAssetUrl] = useState('');
   const [newAssetType, setNewAssetType] = useState<'video' | 'image' | 'audio' | 'doc'>('video');
+  const [isTeleprompterOpen, setIsTeleprompterOpen] = useState(false);
 
   const checklist = content.checklist;
 
@@ -167,21 +170,36 @@ export const TabChecklist: React.FC<TabChecklistProps> = ({ content, onChange })
           <div className="space-y-2.5 text-xs">
             
             {/* 1. Voice-over */}
-            <div 
-              onClick={() => toggleCheck('voRecorded')}
-              className="cursor-pointer flex items-start gap-3 p-3 rounded-xl bg-slate-950/60 hover:bg-slate-950 border border-slate-800/80 transition-colors"
-            >
-              {checklist.voRecorded ? (
-                <CheckSquare className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-              ) : (
-                <Square className="w-4 h-4 text-slate-600 flex-shrink-0 mt-0.5" />
-              )}
-              <div>
-                <strong className={`block ${checklist.voRecorded ? 'text-white' : 'text-slate-300'}`}>
-                  1. Rekaman Voice-Over Selesai & Jernih
-                </strong>
-                <span className="text-[11px] text-slate-400">Tempo bicara bertenaga 130–160 WPM, zero dead air pada detik ke-0.</span>
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 hover:bg-slate-950 border border-slate-800/80 transition-colors gap-3">
+              <div 
+                onClick={() => toggleCheck('voRecorded')}
+                className="cursor-pointer flex items-start gap-3 flex-1"
+              >
+                {checklist.voRecorded ? (
+                  <CheckSquare className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Square className="w-4 h-4 text-slate-600 flex-shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <strong className={`block ${checklist.voRecorded ? 'text-white' : 'text-slate-300'}`}>
+                    1. Rekaman Voice-Over Selesai & Jernih
+                  </strong>
+                  <span className="text-[11px] text-slate-400">Tempo bicara bertenaga 130–160 WPM, zero dead air pada detik ke-0.</span>
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsTeleprompterOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-[11px] font-semibold shrink-0 transition-all"
+                title="Buka Mode Teleprompter untuk Pembacaan Voice-Over"
+              >
+                <Mic className="w-3 h-3 text-cyan-400" />
+                Teleprompter
+              </button>
             </div>
 
             {/* 2. B-Roll 1080p */}
@@ -425,6 +443,20 @@ export const TabChecklist: React.FC<TabChecklistProps> = ({ content, onChange })
         </div>
 
       </div>
+
+      {/* TELEPROMPTER MODAL */}
+      <TeleprompterModal
+        content={content}
+        isOpen={isTeleprompterOpen}
+        onClose={() => setIsTeleprompterOpen(false)}
+        onMarkVoCompleted={() => {
+          onChange({
+            ...content,
+            checklist: { ...content.checklist, voRecorded: true },
+            updatedAt: new Date().toISOString()
+          });
+        }}
+      />
 
     </div>
   );

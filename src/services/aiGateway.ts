@@ -232,6 +232,92 @@ Keluarkan dalam format JSON array murni:
   ];
 }
 
+// 4. Hook Alternatives Assistant (Detik 0-3)
+export async function generateHookAlternatives(
+  topicTitle: string,
+  pillar: ContentPillar = 'internet_social',
+  format: ContentFormat = 'flash_news',
+  contextNotes = '',
+  config: AiGatewayConfig
+): Promise<string[]> {
+  const formatInfo = CONTENT_FORMATS[format];
+  try {
+    const prompt = `
+Buatkan 4 alternatif kalimat HOOK TAJAM untuk detik 0–3 pada YouTube Shorts Zeinity.
+- Topik / Judul: "${topicTitle}"
+- Pilar: "${CONTENT_PILLARS[pillar].name}"
+- Format: "${formatInfo.name}"
+- Konteks Tambahan: "${contextNotes || 'Perubahan penting di ekosistem digital'}"
+
+SYARAT HOOK ZEINITY:
+1. Panjang pas: 8–15 kata (durasi baca 0–3 detik).
+2. DILARANG keras menyapa ("Halo guys", "Kembali lagi", dsb).
+3. Langsung ke inti masalah, rasa penasaran ekstrem (curiosity gap), atau pola interupsi tajam (pattern interrupt).
+4. Setiap opsi harus memiliki variasi pendekatan: (1) Peringatan darurat, (2) Pertanyaan mencengangkan, (3) Bukti rahasia/changelog, (4) Aksi langsung.
+
+Keluarkan dalam format JSON array string murni tanpa teks pengantar:
+["Hook 1...", "Hook 2...", "Hook 3...", "Hook 4..."]
+`;
+
+    const raw = await callNineRouter(config, [
+      { role: 'system', content: ZEINITY_SYSTEM_PROMPT },
+      { role: 'user', content: prompt }
+    ]);
+
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+  } catch (err) {
+    console.warn('Gagal memanggil 9Router untuk Hook, menggunakan fallback cerdas:', err);
+  }
+
+  return getFallbackHookAlternatives(topicTitle, pillar);
+}
+
+// 5. Seamless Loop & Ending Assistant (Detik 46-60)
+export async function generateEndingLoopAlternatives(
+  topicTitle: string,
+  hookText: string,
+  pillar: ContentPillar = 'internet_social',
+  format: ContentFormat = 'flash_news',
+  config: AiGatewayConfig
+): Promise<string[]> {
+  const formatInfo = CONTENT_FORMATS[format];
+  try {
+    const prompt = `
+Buatkan 4 alternatif kalimat PENUTUP / SEAMLESS LOOPING untuk detik 46–60 pada YouTube Shorts Zeinity.
+- Topik / Judul: "${topicTitle}"
+- Hook Awal Video: "${hookText || topicTitle}"
+- Pilar: "${CONTENT_PILLARS[pillar].name}"
+- Format: "${formatInfo.name}"
+
+SYARAT PENUTUP ZEINITY:
+1. Panjang: 12–22 kata (durasi baca detik 46–60).
+2. Variasi 1 & 2 WAJIB SEAMLESS LOOP: Kalimat penutup yang di bagian akhir secara gramatikal menyambung mulus kembali ke kata pertama Hook di detik 0 saat video mengulang putar otomatis.
+3. Variasi 3 & 4 SMART ACTIONABLE CTA: Ajakan konkret memeriksa setelan ponsel sekarang atau membagikan ke sesama pengguna.
+4. Hindari CTA klise murahan ("Jangan lupa subscribe").
+
+Keluarkan dalam format JSON array string murni tanpa markdown lain:
+["Ending 1...", "Ending 2...", "Ending 3...", "Ending 4..."]
+`;
+
+    const raw = await callNineRouter(config, [
+      { role: 'system', content: ZEINITY_SYSTEM_PROMPT },
+      { role: 'user', content: prompt }
+    ]);
+
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+  } catch (err) {
+    console.warn('Gagal memanggil 9Router untuk Seamless Loop, menggunakan fallback cerdas:', err);
+  }
+
+  return getFallbackEndingAlternatives(topicTitle, hookText, pillar);
+}
+
 // =======================================================
 // LOCAL FALLBACK GENERATORS (RULE-BASED SMART TEMPLATES)
 // =======================================================
@@ -346,3 +432,23 @@ function getFallbackScript(title: string, format: ContentFormat) {
     totalWords
   };
 }
+
+function getFallbackHookAlternatives(title: string, pillar: ContentPillar): string[] {
+  const cleanTitle = title.replace(/[?]/g, '').trim();
+  return [
+    `Jangan buka atau perbarui aplikasi ini sebelum kamu periksa perubahan satu ini.`,
+    `Ternyata pembaruan resmi terbaru diam-diam mengubah cara kerja ${cleanTitle}.`,
+    `Tiga detik ini bisa menyelamatkan kuota dan privasi akunmu dari aturan baru.`,
+    `Pernahkah kamu sadar kenapa setelan penting ini mendadak aktif tanpa pemberitahuan?`
+  ];
+}
+
+function getFallbackEndingAlternatives(title: string, hookText: string, pillar: ContentPillar): string[] {
+  return [
+    `Dan itulah alasan kenapa kamu harus langsung cek setelan ponselmu sebelum...`,
+    `Jadi sekarang kamu paham kenapa semua pengguna membicarakan perubahan ini dari awal...`,
+    `Langsung periksa setelan ponselmu sekarang sebelum fitur otomatis ini aktif permanen.`,
+    `Simpan video ini sekarang dan bagikan ke temanmu agar tidak kaget dengan aturan baru ini.`
+  ];
+}
+

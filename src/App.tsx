@@ -248,6 +248,7 @@ export function App() {
           onClose={() => setActiveShort(null)}
           onSave={handleSaveContent}
           onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
+          allContents={contents}
         />
       )}
 

@@ -28,6 +28,7 @@ interface WorkspaceModalProps {
   onClose: () => void;
   onSave: (updated: ContentItem) => void;
   onOpenAiAssistant?: () => void;
+  allContents?: ContentItem[];
 }
 
 export const WorkspaceModal: React.FC<WorkspaceModalProps> = ({
@@ -35,7 +36,8 @@ export const WorkspaceModal: React.FC<WorkspaceModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  onOpenAiAssistant
+  onOpenAiAssistant,
+  allContents = []
 }) => {
   const [activeTab, setActiveTab] = useState<'research' | 'script' | 'safezone' | 'checklist' | 'analytics'>('script');
   const [localContent, setLocalContent] = useState<ContentItem>(content);
@@ -285,6 +287,7 @@ export const WorkspaceModal: React.FC<WorkspaceModalProps> = ({
               content={localContent} 
               onChange={handleUpdate} 
               onOpenAiAssistant={onOpenAiAssistant} 
+              allContents={allContents}
             />
           )}
 

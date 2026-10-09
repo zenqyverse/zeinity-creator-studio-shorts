@@ -10,7 +10,9 @@ import {
   FileText, 
   ShieldCheck, 
   Plus,
-  RefreshCw
+  RefreshCw,
+  Zap,
+  Repeat
 } from 'lucide-react';
 import { ContentPillar, ContentFormat, ContentItem, AppSettings } from '../types';
 import { CONTENT_PILLARS, CONTENT_FORMATS } from '../constants/zeinityRules';
@@ -18,6 +20,8 @@ import {
   generateTopicIdeas, 
   generateTitleVariations, 
   draftZeinityScript, 
+  generateHookAlternatives,
+  generateEndingLoopAlternatives,
   callNineRouter 
 } from '../services/aiGateway';
 import { createNewShort } from '../services/storage';
@@ -37,7 +41,7 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
   onOpenSettings,
   onCreateShortFromIdea
 }) => {
-  const [activeTab, setActiveTab] = useState<'topics' | 'script' | 'titles' | 'factcheck'>('topics');
+  const [activeTab, setActiveTab] = useState<'topics' | 'titles' | 'hook_loop' | 'script' | 'factcheck'>('topics');
   
   // Topic generation state
   const [selectedPillar, setSelectedPillar] = useState<ContentPillar>('internet_social');
@@ -48,6 +52,12 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
   // Titles generation state
   const [inputTopicForTitles, setInputTopicForTitles] = useState('');
   const [generatedTitles, setGeneratedTitles] = useState<string[]>([]);
+
+  // Hook & Loop generator state
+  const [hookLoopType, setHookLoopType] = useState<'hook' | 'loop'>('hook');
+  const [hookTopic, setHookTopic] = useState('');
+  const [hookRefText, setHookRefText] = useState('');
+  const [generatedHookLoops, setGeneratedHookLoops] = useState<string[]>([]);
 
   // Fact check state
   const [claimToVerify, setClaimToVerify] = useState('');
@@ -145,6 +155,42 @@ Tolong berikan:
     }
   };
 
+  const handleFetchHookLoops = async () => {
+    if (!hookTopic.trim()) return;
+    setIsLoading(true);
+    try {
+      const config = {
+        baseUrl: settings.nineRouterBaseUrl,
+        apiKey: settings.nineRouterApiKey,
+        comboName: settings.nineRouterCombo
+      };
+
+      if (hookLoopType === 'hook') {
+        const hooks = await generateHookAlternatives(
+          hookTopic,
+          selectedPillar,
+          selectedFormat,
+          hookRefText,
+          config
+        );
+        setGeneratedHookLoops(hooks);
+      } else {
+        const loops = await generateEndingLoopAlternatives(
+          hookTopic,
+          hookRefText,
+          selectedPillar,
+          selectedFormat,
+          config
+        );
+        setGeneratedHookLoops(loops);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleUseTopic = (topic: { title: string; hook: string; claim: string }) => {
     if (onCreateShortFromIdea) {
       const short = createNewShort(topic.title, selectedPillar, selectedFormat);
@@ -195,26 +241,34 @@ Tolong berikan:
       </div>
 
       {/* Tabs */}
-      <div className="bg-[#121422] px-4 border-b border-slate-800 flex items-center gap-1 text-xs">
+      <div className="bg-[#121422] px-3 border-b border-slate-800 flex items-center gap-1 text-xs overflow-x-auto scrollbar-none">
         <button
           onClick={() => setActiveTab('topics')}
-          className={`py-2.5 px-3 font-semibold border-b-2 transition-all ${
+          className={`py-2.5 px-2.5 font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'topics' ? 'border-purple-500 text-purple-300' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
-          Topic Discovery
+          Topik
         </button>
         <button
           onClick={() => setActiveTab('titles')}
-          className={`py-2.5 px-3 font-semibold border-b-2 transition-all ${
+          className={`py-2.5 px-2.5 font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'titles' ? 'border-purple-500 text-purple-300' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
-          Variasi Judul
+          Judul
+        </button>
+        <button
+          onClick={() => setActiveTab('hook_loop')}
+          className={`py-2.5 px-2.5 font-semibold border-b-2 transition-all whitespace-nowrap ${
+            activeTab === 'hook_loop' ? 'border-purple-500 text-purple-300' : 'border-transparent text-slate-400 hover:text-white'
+          }`}
+        >
+          Hook & Looping
         </button>
         <button
           onClick={() => setActiveTab('script')}
-          className={`py-2.5 px-3 font-semibold border-b-2 transition-all ${
+          className={`py-2.5 px-2.5 font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'script' ? 'border-purple-500 text-purple-300' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
@@ -222,7 +276,7 @@ Tolong berikan:
         </button>
         <button
           onClick={() => setActiveTab('factcheck')}
-          className={`py-2.5 px-3 font-semibold border-b-2 transition-all ${
+          className={`py-2.5 px-2.5 font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'factcheck' ? 'border-purple-500 text-purple-300' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
@@ -341,6 +395,137 @@ Tolong berikan:
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB: GENERATOR HOOK & LOOPING */}
+        {activeTab === 'hook_loop' && (
+          <div className="space-y-4">
+            <p className="text-xs text-slate-400">
+              Buat alternatif Hook tajam (0–3s, 8–15 kata) atau Seamless Looping penutup (46–60s) yang menyambung kembali ke awal naskah.
+            </p>
+
+            {/* Type selector: Hook vs Loop */}
+            <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+              <button
+                onClick={() => setHookLoopType('hook')}
+                className={`flex-1 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  hookLoopType === 'hook'
+                    ? 'bg-cyan-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5" />
+                Alternatif Hook (0–3s)
+              </button>
+              <button
+                onClick={() => setHookLoopType('loop')}
+                className={`flex-1 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  hookLoopType === 'loop'
+                    ? 'bg-pink-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Repeat className="w-3.5 h-3.5" />
+                Seamless Loop (46–60s)
+              </button>
+            </div>
+
+            <div className="space-y-2.5 text-xs">
+              <div>
+                <label className="block text-[10px] text-slate-400 font-medium mb-1">
+                  Topik / Judul Short:
+                </label>
+                <input
+                  type="text"
+                  value={hookTopic}
+                  onChange={e => setHookTopic(e.target.value)}
+                  placeholder="cth: Apa Saja Fitur Baru WhatsApp Bulan Ini?"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] text-slate-400 font-medium mb-1">
+                  {hookLoopType === 'hook' ? 'Konteks / Sinyal Tambahan (Opsional):' : 'Teks Hook Awal (Untuk Loop Balik):'}
+                </label>
+                <input
+                  type="text"
+                  value={hookRefText}
+                  onChange={e => setHookRefText(e.target.value)}
+                  placeholder={hookLoopType === 'hook' ? 'cth: Aturan privasi baru larang screenshot foto profil' : 'cth: WhatsApp baru saja merilis pembaruan privasi...'}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] text-slate-400 font-medium mb-1">Pilar:</label>
+                  <select
+                    value={selectedPillar}
+                    onChange={e => setSelectedPillar(e.target.value as ContentPillar)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white focus:outline-none"
+                  >
+                    {Object.values(CONTENT_PILLARS).map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] text-slate-400 font-medium mb-1">Format:</label>
+                  <select
+                    value={selectedFormat}
+                    onChange={e => setSelectedFormat(e.target.value as ContentFormat)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white focus:outline-none"
+                  >
+                    {Object.values(CONTENT_FORMATS).map(f => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <button
+                onClick={handleFetchHookLoops}
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold transition-all mt-2"
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                {isLoading ? 'Membuat Alternatif...' : hookLoopType === 'hook' ? 'Generate 4 Alternatif Hook' : 'Generate 4 Seamless Loop'}
+              </button>
+            </div>
+
+            {/* Results */}
+            <div className="space-y-2 pt-2">
+              {generatedHookLoops.map((text, idx) => {
+                const words = text.split(/\s+/).filter(Boolean).length;
+                return (
+                  <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-semibold text-slate-200 leading-relaxed flex-1">
+                        <span className="text-purple-400 font-bold mr-1.5">#{idx + 1}</span>
+                        {text}
+                      </span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(text);
+                          setCopiedIndex(idx);
+                          setTimeout(() => setCopiedIndex(null), 1500);
+                        }}
+                        className="p-1 text-slate-400 hover:text-white shrink-0"
+                        title="Salin teks"
+                      >
+                        {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                      <span>{words} kata</span>
+                      <span>~{Math.round((words / 145) * 60)}s</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

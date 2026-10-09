@@ -45,6 +45,20 @@ export interface ResearchSource {
   isOfficialSource: boolean;
 }
 
+export interface ScriptVersionSnapshot {
+  id: string;
+  version: number;
+  timestamp: string;
+  stageHook: string;
+  stageContext: string;
+  stagePayoff: string;
+  stageEnding: string;
+  fullScript: string;
+  wordCount: number;
+  wpmPace: number;
+  note?: string;
+}
+
 export interface ScriptData {
   stageHook: string;       // Stage 1: Hook (0-3s)
   stageContext: string;    // Stage 2: Context (4-10s)
@@ -53,6 +67,7 @@ export interface ScriptData {
   fullScript: string;      // Continuous merged text
   wpmPace: number;         // Default 145 (range 130-160)
   version: number;
+  history?: ScriptVersionSnapshot[];
 }
 
 export interface StoryboardShot {

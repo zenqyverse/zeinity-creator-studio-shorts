@@ -9,11 +9,14 @@ import {
   Tag, 
   Clock, 
   Zap,
-  CheckCircle2
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink
 } from 'lucide-react';
 import { ContentItem, ContentPillar, ContentFormat } from '../types';
 import { CONTENT_PILLARS, CONTENT_FORMATS } from '../constants/zeinityRules';
 import { createNewShort } from '../services/storage';
+import { findSimilarTopics } from '../services/similarityService';
 
 interface IdeaBankViewProps {
   contents: ContentItem[];
@@ -41,6 +44,9 @@ export const IdeaBankView: React.FC<IdeaBankViewProps> = ({
     c.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
     c.notes.toLowerCase().includes(searchFilter.toLowerCase())
   );
+
+  // Deteksi kemiripan topik secara real-time dari seluruh database
+  const similarTopics = findSimilarTopics(newTitle, contents);
 
   const handleCreateIdea = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,6 +159,48 @@ export const IdeaBankView: React.FC<IdeaBankViewProps> = ({
               </select>
             </div>
           </div>
+
+          {/* TOPIC SIMILARITY WARNING IN IDEA BANK */}
+          {similarTopics.length > 0 && (
+            <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2 animate-fadeIn">
+              <div className="flex items-center justify-between text-xs font-bold text-amber-300">
+                <span className="flex items-center gap-1.5">
+                  <AlertCircle className="w-4 h-4 text-amber-400" />
+                  Peringatan Kemiripan Topik ({similarTopics.length} video serupa terdeteksi di database)
+                </span>
+              </div>
+              <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                Topik atau judul yang kamu ketik memiliki kemiripan kata kunci dengan konten yang sudah ada di database. Silakan periksa daftar berikut untuk mencegah duplikasi:
+              </p>
+              <div className="space-y-1.5 pt-1">
+                {similarTopics.slice(0, 3).map(sim => (
+                  <div key={sim.item.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-950/70 p-2.5 rounded-lg border border-amber-500/20 text-xs">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0 ${
+                        sim.similarityLevel === 'high' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      }`}>
+                        {sim.score}% Mirip
+                      </span>
+                      <span className="text-white font-medium truncate">{sim.item.title}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] shrink-0">
+                      <span className="font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded uppercase">
+                        {sim.item.status}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => onOpenShort(sim.item)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Buka
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-[11px] font-semibold text-slate-300 mb-1">
