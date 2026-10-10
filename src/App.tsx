@@ -228,6 +228,8 @@ export function App() {
               onOpenShort={item => setActiveShort(item)}
               onNewShort={handleCreateNewShort}
               onUpdateStatus={handleUpdateStatus}
+              onSaveContent={handleSaveContent}
+              onDeleteContent={handleDeleteContent}
             />
           )}
 
